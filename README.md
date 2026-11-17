@@ -2,6 +2,10 @@
 
 ## Live website
 
+- **Beach Office — Seating Editor:** https://office-seating-planner-pkclaude-3994.vercel.app/
+- **Beach Office — 2D / 3D / Walk:** https://office-seating-planner-pkclaude-3994.vercel.app/layout.html
+- **Main Office — Floors 1, 2, 3:** https://office-seating-planner-pkclaude-3994.vercel.app/main-office.html
+
 **[Open the live Office Seating Planner — 2D & 3D Layout](https://office-seating-planner-pkclaude-3994.vercel.app/layout.html)**
 
 The seating editor is available at [the site homepage](https://office-seating-planner-pkclaude-3994.vercel.app/).
@@ -10,6 +14,8 @@ Static seating editor and live Three.js office floor plan using Vercel serverles
 
 ## Functionality
 
+- **Main Office** has independent Floor 1, Floor 2 and Floor 3 2D reference boards; image uploads and seat annotations are stored locally in each browser until dedicated backend persistence is configured.
+- Existing Beach Office seating data, geometry and MongoDB API remain untouched.
 - `index.html` — editable seats with automatic PATCH saving and live GET refresh.
 - `layout.html` — immersive office model supplied by the project owner, with **Top View**, **3D View**, **Walk**, seat selection, and **Edit Name** action.
 - `api/seats.js` — shared MongoDB endpoint, using `MONGODB_URI` from server-side environment variables.

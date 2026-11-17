@@ -1,5 +1,11 @@
 # Office Seating Planner
 
+## Live website
+
+**[Open the live Office Seating Planner — 2D & 3D Layout](https://office-seating-planner-pkclaude-3994.vercel.app/layout.html)**
+
+The seating editor is available at [the site homepage](https://office-seating-planner-pkclaude-3994.vercel.app/).
+
 Static seating editor and live Three.js office floor plan using Vercel serverless API and MongoDB Atlas.
 
 ## Functionality

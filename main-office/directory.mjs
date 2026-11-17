@@ -4,13 +4,6 @@ export function createDirectory({ seats, seatName, selectedSeat, read, save, foc
   let employees = [], failure = '', loading = false, targetKey = null, selectedEmployeeId = null;
   const el = id => document.getElementById(id), dialog = el('assignment-dialog');
   const validKeys = seats.map(s => s.key);
-  const codeKey = 'main-office-directory-access';
-  const auth = () => sessionStorage.getItem(codeKey) || '';
-  const requestCode = () => {
-    const entered = window.prompt('Enter your employee-directory access code (not the PeopleSimple API token):', '')?.trim();
-    if (!entered) return false;
-    sessionStorage.setItem(codeKey, entered); return true;
-  };
   const label = key => seatName(seats.find(s => s.key === key)) || key;
   function renderSearch() {
     const container = el('person-results'), query = el('q').value.trim();
@@ -43,7 +36,7 @@ export function createDirectory({ seats, seatName, selectedSeat, read, save, foc
   }
   function render() {
     el('directory-login').hidden = !failure;
-    el('directory-login').textContent = auth() ? 'RETRY EMPLOYEE LIST' : 'ACCESS EMPLOYEE LIST';
+    el('directory-login').textContent = 'RETRY EMPLOYEE LIST';
     renderSearch();
     if (!targetKey) return;
     const target = seats.find(s => s.key === targetKey);
@@ -84,22 +77,14 @@ export function createDirectory({ seats, seatName, selectedSeat, read, save, foc
   async function load() {
     loading = true; failure = ''; render();
     try {
-      const response = await fetch('/api/employees', {
-        cache: 'no-store', headers: { 'X-Directory-Key': auth() }
-      });
+      const response = await fetch('/data/employees.json', {cache:'force-cache'});
       const data = await response.json();
       if (!response.ok || !Array.isArray(data.employees)) throw Error(data.error || 'Employee directory unavailable.');
       employees = data.employees;
     } catch (error) { failure = error.message || 'Employee directory unavailable.'; employees = []; }
     loading = false; render();
   }
-  const retry = () => {
-    if (!auth() || /access code|expired|unauthori/i.test(failure)) {
-      sessionStorage.removeItem(codeKey);
-      if (!requestCode()) return;
-    }
-    load();
-  };
+  const retry = () => { load(); };
   function open(key) {
     if (!validKeys.includes(key)) return;
     targetKey = key;

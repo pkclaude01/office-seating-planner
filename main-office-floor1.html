@@ -110,7 +110,8 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 // (1200×1600 photo) are converted to metres: 1 px ≈ 2 cm. North = top of sketch.
 // ---------------------------------------------------------------------------
 const S = 0.02, X = px => +((px - 580) * S).toFixed(2), Z = py => +((py - 840) * S).toFixed(2);
-const B = { x1: X(70), x2: X(1090), z1: Z(150), z2: Z(1530) }; // -10.2..10.2, -13.8..13.8
+const B = { x1: X(70), x2: X(1090), z1: Z(150), z2: Z(1680) }; // -10.2..10.2, -13.8..16.8
+const CX = (B.x1 + B.x2) / 2, CZ = (B.z1 + B.z2) / 2;
 const PLAN_KEY = 'main-f1';
 
 // Tables: cx/cz centre, len along the seat rows, dep across. vertical = rows run north–south.
@@ -134,26 +135,24 @@ const ROOMS = [
   room('CABIN', 130, 480, 265, 630),
   room('SCRUM ROOM', 265, 480, 400, 630),
   room('SOFA', 555, 175, 725, 265, { open: true, ly: 1.2 }),
-  room('WASH ROOM', 70, 1405, 310, 1530),
-  room('PROJECTOR', 310, 1425, 858, 1530, { open: true, lz: Z(1395) }),
-  room('MEETING ROOM', 858, 1385, 1090, 1530)
+  // behind the projector wall: wash room up to the middle of the projector, meeting room for the rest
+  room('PROJECTOR', 330, 1330, 840, 1425, { open: true, lz: Z(1395) }),
+  room('WASH ROOM', 70, 1425, 584, 1680),
+  room('MEETING ROOM', 584, 1425, 1090, 1680)
 ];
 const EXITS = [{ n: 'EXIT 1', z: Z(560) }, { n: 'EXIT 2', z: Z(1240) }];
 // Walls: [px1, py1, px2, py2, glass?] in sketch pixels.
 const W = [
-  [70, 150, 1090, 150], [70, 150, 70, 1530], [70, 1530, 1090, 1530],
-  [1090, 150, 1090, 520], [1090, 600, 1090, 1200], [1090, 1280, 1090, 1530],
+  [70, 150, 1090, 150], [70, 150, 70, 1680], [70, 1680, 1090, 1680],
+  [1090, 150, 1090, 520], [1090, 600, 1090, 1200], [1090, 1280, 1090, 1680],
   // gate frame + short partition down to the cabin block
   [325, 305, 405, 305, 1], [405, 305, 405, 400, 1], [325, 400, 405, 400, 1], [380, 400, 380, 478],
   // cabin + scrum block (door gaps on the south side)
   [130, 480, 400, 480], [130, 480, 130, 630], [400, 480, 400, 630, 1], [265, 480, 265, 630],
   [130, 630, 175, 630], [225, 630, 300, 630, 1], [350, 630, 400, 630, 1],
   // wash room
-  [70, 1405, 220, 1405], [270, 1405, 310, 1405], [310, 1405, 310, 1530],
-  // projector wall between the rooms
-  [310, 1425, 858, 1425],
-  // meeting room (glass, door gap on its west side)
-  [858, 1385, 1090, 1385, 1], [858, 1385, 858, 1430, 1], [858, 1480, 858, 1530, 1]
+  // projector wall across the floor (doors at each end) + wash room / meeting room divider
+  [70, 1425, 170, 1425], [250, 1425, 920, 1425], [1000, 1425, 1090, 1425], [584, 1425, 584, 1680],
 ].map(([a, b, c, d, g]) => [X(a), Z(b), X(c), Z(d), g]);
 
 // Seats: two rows per table; vertical table rows are left/right. Plus one cabin seat.
@@ -240,7 +239,7 @@ controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, R
 scene.add(new THREE.HemisphereLight('#e6f1ff', '#3a4656', 0.9));
 const sun = new THREE.DirectionalLight('#fff3e2', 2.4);
 sun.position.set(10, 26, 8); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
-Object.assign(sun.shadow.camera, { left: -17, right: 17, top: 17, bottom: -17, near: 1, far: 70 });
+Object.assign(sun.shadow.camera, { left: -19, right: 19, top: 19, bottom: -19, near: 1, far: 80 });
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02; scene.add(sun);
 const fill = new THREE.DirectionalLight('#9cc8ff', 0.5); fill.position.set(-12, 10, -8); scene.add(fill);
 
@@ -272,7 +271,7 @@ const FW = B.x2 - B.x1, FD = B.z2 - B.z1;
 const floorTex = tex('#cfc8bc', '#b6aea2', 4, 4, 0.05); floorTex.repeat.set(FW / 2.4, FD / 2.4);
 const side = M({ color: '#8b95a3' });
 const slab = new THREE.Mesh(Bx(FW + 0.3, 0.24, FD + 0.3), [side, side, M({ map: floorTex, roughness: 0.8 }), side, side, side]);
-slab.position.y = -0.12; slab.receiveShadow = true; scene.add(slab);
+slab.position.set(CX, -0.12, CZ); slab.receiveShadow = true; scene.add(slab);
 const zone = (x1, z1, x2, z2, mat) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(x2 - x1, z2 - z1), mat); m.rotation.x = -Math.PI / 2; m.position.set((x1 + x2) / 2, 0.004, (z1 + z2) / 2); m.receiveShadow = true; scene.add(m); };
 const R = n => ROOMS.find(r => r.n === n);
 const wTex = tex('#eef1f3', '#c8cfd6', 8, 8, 0.03); wTex.repeat.set(3, 2);
@@ -416,10 +415,16 @@ const deskLabels = TABLES.map(t => {
 // wash room fixtures
 {
   const r = R('WASH ROOM');
-  [r.x1 + 0.9, r.x1 + 2.3, r.x1 + 3.7].forEach(x => {
+  const stall = M({ color: '#9fb3c4', roughness: 0.5 });
+  [r.x1 + 3.2, r.x1 + 4.6, r.x1 + 6.0, r.x1 + 7.4].forEach(x => {
     add(Bx(0.4, 0.4, 0.2), white, x, 0.6, r.z2 - 0.12);
     const bowl = add(new THREE.CylinderGeometry(0.2, 0.16, 0.4, 20), white, x, 0.2, r.z2 - 0.4); bowl.scale.x = 0.85;
+    add(Bx(0.04, 1.9, 1.5), stall, x + 0.7, 1.05, r.z2 - 0.75);
   });
+  // sink counter + mirror on the west wall
+  add(Bx(0.55, 0.78, 2.6), M({ color: '#d7d0c4', roughness: 0.8 }), r.x1 + 0.35, 0.41, (r.z1 + r.z2) / 2 + 0.6);
+  add(Bx(0.57, 0.08, 2.6), M({ color: '#2f343b', roughness: 0.3 }), r.x1 + 0.35, 0.86, (r.z1 + r.z2) / 2 + 0.6);
+  add(Bx(0.02, 0.9, 2.6), M({ color: '#b8d4ea', roughness: 0.05, metalness: 0.9 }), r.x1 + 0.08, 1.65, (r.z1 + r.z2) / 2 + 0.6);
 }
 // projector screen on the south partition + ceiling projector
 {
@@ -432,10 +437,11 @@ const deskLabels = TABLES.map(t => {
 // meeting room: oval table with chairs + TV
 {
   const r = R('MEETING ROOM'), cx = (r.x1 + r.x2) / 2, cz = (r.z1 + r.z2) / 2 + 0.1;
-  const top = add(new THREE.CylinderGeometry(1, 1, 0.05, 48), wood, cx, 0.735, cz); top.scale.set(1.4, 1, 0.55);
+  const top = add(new THREE.CylinderGeometry(1, 1, 0.05, 48), wood, cx, 0.735, cz); top.scale.set(2.4, 1, 0.75);
   [-0.65, 0.65].forEach(dx => add(new THREE.CylinderGeometry(0.08, 0.25, 0.71, 16), metal, cx + dx, 0.355, cz));
   const cm = M({ color: '#3b4a5c', roughness: 0.9 });
-  [-0.8, 0, 0.8].forEach(dx => { mkChair(cm, cx + dx, cz - 0.85, 0); mkChair(cm, cx + dx, cz + 0.85, Math.PI); });
+  [-1.6, -0.8, 0, 0.8, 1.6].forEach(dx => { mkChair(cm, cx + dx, cz - 1.15, 0); mkChair(cm, cx + dx, cz + 1.15, Math.PI); });
+  mkChair(cm, cx - 3.0, cz, Math.PI / 2); mkChair(cm, cx + 3.0, cz, -Math.PI / 2);
   add(Bx(0.05, 0.9, 1.6), dark, r.x2 - 0.1, 1.5, cz);
 }
 // exits: door frames + green signs
@@ -510,8 +516,8 @@ function flyTo(p, t, onEnd, dur) {
 }
 function setMode(m, instant) {
   state.mode = m; state.hoverKey = null; const c = controls, d = instant ? 1 : undefined;
-  if (m === 'plan') flyTo(V(0, planDist(), 0.01), V(0, 0, 0), () => { c.target.set(0, 0, 0); c.enableRotate = false; c.mouseButtons.LEFT = THREE.MOUSE.PAN; c.enabled = true; c.update(); }, d);
-  if (m === 'orbit') flyTo(V(18, 24, 30), V(0, 0, 0), () => { c.target.set(0, 0, 0); c.enableRotate = true; c.mouseButtons.LEFT = THREE.MOUSE.ROTATE; c.enabled = true; c.update(); }, d);
+  if (m === 'plan') flyTo(V(CX, planDist(), CZ + 0.01), V(CX, 0, CZ), () => { c.target.set(CX, 0, CZ); c.enableRotate = false; c.mouseButtons.LEFT = THREE.MOUSE.PAN; c.enabled = true; c.update(); }, d);
+  if (m === 'orbit') flyTo(V(CX + 18, 24, CZ + 30), V(CX, 0, CZ), () => { c.target.set(CX, 0, CZ); c.enableRotate = true; c.mouseButtons.LEFT = THREE.MOUSE.ROTATE; c.enabled = true; c.update(); }, d);
   if (m === 'walk') { yaw = Math.PI; pitch = -0.08; const p = V(X(505), 1.6, Z(300)); flyTo(p, p.clone().add(fwd()).add(V(0, -0.08, 0)), () => { walking = true; }, d); }
   renderUI(); styleLabels();
 }

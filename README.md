@@ -1,5 +1,50 @@
 # Office Seating Planner
 
-HTML, CSS, JavaScript, Three.js office floor plan, editable seating, MongoDB-backed API, and Vercel deployment.
+Static seating editor and live Three.js office floor plan using Vercel serverless API and MongoDB Atlas.
 
-The `main` branch is the sole production deployment source. Configure the existing Vercel project's Git integration or GitHub Actions production deployment credentials before enabling automatic deployment.
+## Functionality
+
+- `index.html` — editable seats with automatic PATCH saving and live GET refresh.
+- `layout.html` — immersive office model supplied by the project owner, with **Top View**, **3D View**, **Walk**, seat selection, and **Edit Name** action.
+- `api/seats.js` — shared MongoDB endpoint, using `MONGODB_URI` from server-side environment variables.
+- 42 seats: T1/T2/T3 = 3 per side; T4/T5 = 6 per side.
+- Original MongoDB document `_id: "main"` in collection `seating_plans` is retained.
+
+## Layout geometry
+
+The model uses the supplied reference HTML: from top to bottom T5, T4, T3, T2, T1 with the dining area in front of T1. Conference rooms C1/C2 and washroom to the right, entrance and store room to the left. No 3D sample employee names are written to MongoDB.
+
+## Environment
+
+Set `MONGODB_URI` in **Vercel → Project → Settings → Environment Variables**, Production. Do not commit it or print it.
+
+## GitHub CI/CD
+
+The workflow in `.github/workflows/ci.yml` validates every PR against `main` and deploys **only pushes to `main`** to the existing Vercel production project. Pull requests do not deploy.
+
+Create a **private** repository, push this directory to the `main` branch, and set these variables in GitHub repository settings:
+
+- **Secret** `VERCEL_TOKEN`: a Vercel token (never paste it in chat or code).
+- **Variable** `VERCEL_ORG_ID`: `team_rDw84UOM0PmU6hjWJCsjVZpL`.
+- **Variable** `VERCEL_PROJECT_ID`: `prj_dOsjqlsk1vZEnOg5UU4r9YBJ3Mcs`.
+
+To avoid duplicate deployments, leave Vercel automatic Git deployment **disabled** when using the included GitHub Actions production deployment workflow.
+
+Push from terminal after creating an empty repository on GitHub:
+
+```sh
+git init -b main
+git add .
+git commit -m "Initialize office seating planner with shared 2D and 3D layout"
+git remote add origin https://github.com/<YOUR-USERNAME>/office-seating-planner.git
+git push -u origin main
+```
+
+For production, restrict GitHub `production` environment deployments to the `main` branch, and enable branch protections/reviews as appropriate.
+
+## Security
+
+The site is publicly viewable and presently allows editing without authentication, so anyone can change a name. Consider editor authentication and rate limiting. Rotate database credentials that were previously shared in chat and update the Vercel environment variable.
+## Mouse controls
+
+Top view: drag to pan and scroll to zoom. 3D view: left drag rotates, right drag pans, scroll zooms. Click a chair to select it, double-click to edit its name, or select from the sidebar and use Edit Name. The floor model and text labels now share the same canvas bounds.

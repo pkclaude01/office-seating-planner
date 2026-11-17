@@ -1,0 +1,14 @@
+{
+  "name": "office-seating-planner",
+  "version": "1.4.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node --check api/seats.js && node scripts/check-layout.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.20.0"
+  }
+}

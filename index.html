@@ -30,19 +30,19 @@ footer{text-align:center;color:#8a97a8;font-size:12px;margin-top:27px}
 @media print{.app-nav{display:none}}
 .office-global-header{position:relative;z-index:100;background:#0c1d32;color:#e8f3ff;border-bottom:1px solid #315370;box-shadow:0 4px 18px #0002;font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .office-global-inner{max-width:1600px;margin:0 auto;min-height:58px;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
-.office-global-brand{white-space:nowrap;font-size:15px;font-weight:850;letter-spacing:.025em;color:#fff}
+.office-global-brand{display:flex;align-items:center;gap:10px;min-width:0;font-size:15px;font-weight:850;letter-spacing:.025em;color:#fff}.office-brand-logo{display:block;width:151px;height:40px;object-fit:contain;background:#000;border-radius:5px;filter:brightness(1.6)}.office-global-brand span{white-space:nowrap}
 .office-global-tabs{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .office-global-tabs a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;padding:10px 17px;border:1px solid #395979;border-radius:8px;background:#152b45;color:#cfdef0;font-size:13px;line-height:1.2;white-space:nowrap;font-weight:750;transition:background .15s}
 .office-global-tabs a:hover{background:#254665;color:#fff}
 .office-global-tabs a.active,.office-global-tabs a[aria-current="page"]{background:#7fc4ff;color:#06182c;border-color:#7fc4ff}
 .office-global-tabs a:focus-visible{outline:2px solid #ffb547;outline-offset:2px}
-@media(max-width:640px){.office-global-inner{gap:7px;min-height:54px;padding:7px 10px}.office-global-brand{font-size:12px}.office-global-tabs a{font-size:11px;padding:9px 10px}}
+@media(max-width:640px){.office-global-inner{gap:7px;min-height:54px;padding:7px 10px}.office-global-brand{font-size:12px;gap:7px}.office-brand-logo{width:103px;height:28px}.office-global-tabs a{font-size:11px;padding:9px 10px}}
 
 .office-global-header{position:sticky;top:0}header:not(.office-global-header){top:58px}
 </style>
 </head>
 <body>
-<header class="office-global-header" aria-label="Office navigation header"><div class="office-global-inner"><div class="office-global-brand">OFFICE SEATING PLANNER</div><nav class="office-global-tabs" aria-label="Office tabs"><a href="/layout.html" class="active" aria-current="page">Beach Office</a><a href="/main-office-floor1.html">Main Office · 1st Floor</a><a href="/main-office-floor2.html">Main Office · 2nd Floor</a></nav></div></header>
+<header class="office-global-header" aria-label="Office navigation header"><div class="office-global-inner"><div class="office-global-brand"><img class="office-brand-logo" src="/assets/aerosimple-logo.svg" alt="Aerosimple logo" width="151" height="40"><span>Office Seating Planner</span></div><nav class="office-global-tabs" aria-label="Office tabs"><a href="/layout.html" class="active" aria-current="page">Beach Office</a><a href="/main-office-floor1.html">Main Office · 1st Floor</a><a href="/main-office-floor2.html">Main Office · 2nd Floor</a></nav></div></header>
 <header><div class="header-inner"><div><h1>Beach Office · Seating Planner</h1><div class="sub">Click any seat label to add or edit a name. Changes are shared across devices and saved to MongoDB.</div></div><div class="actions"><button id="download">Export names (CSV)</button><button id="reset">Reset seating</button><button class="primary" id="print">Print / Save PDF</button></div></div></header>
 <main><div class="app-nav"><a class="active" href="/">Seating Editor</a><a href="/layout.html">Open Beach Office 2D / 3D / Walk View</a></div><div class="info"><span><i class="dot"></i>Named seat</span><span><i class="dot empty"></i>Available seat</span><span><strong>Tables 1–3:</strong> 3 seats per side</span><span><strong>Tables 4–5:</strong> 6 seats per side</span><span id="counter"></span><span id="sync-status" role="status" aria-live="polite">Connecting…</span></div><div id="floor" class="floor"></div><footer>Live shared seating • All 5 tables • 42 seats total</footer></main>
 <script>

@@ -15,15 +15,28 @@ The seating editor is available at [the site homepage](https://office-seating-pl
 
 Static seating editor and live Three.js office floor plan using Vercel serverless API and MongoDB Atlas.
 
+## One-time employee list (private static JSON)
+
+Employee search now reads a **fixed JSON snapshot** instead of contacting PeopleSimple on each visit. The site's `/api/employees` endpoint only reads `EMPLOYEE_DIRECTORY_JSON` or a private local file and requires `EMPLOYEE_DIRECTORY_ACCESS_KEY`. No live PeopleSimple calls are made by the deployed site.
+
+**Import the roster once:**
+
+1. On a trusted computer, obtain the PeopleSimple API bearer token securely (never send it in chat, frontend HTML or GitHub).
+2. Run `PEOPLESIMPLE_TOKEN=... node scripts/fetch-employees-once.cjs`. This fetches active employees **one time** and writes `.private/employee-directory.json` with `id`, `employeeCode`, `name` only.
+3. In **Vercel → Project → Settings → Environment Variables → Production**, securely set `EMPLOYEE_DIRECTORY_JSON` to the contents of that file, and `EMPLOYEE_DIRECTORY_ACCESS_KEY` to a separate strong staff access code. Redeploy production to apply changes.
+4. The JSON is reused until **you manually update it**. Search filters that fetched list in the browser.
+
+**Privacy:** This GitHub repository is public. Do **not** commit your real employee roster: `.private/` is ignored. The employee list is not downloadable as a public JSON URL. If you cannot set a sufficiently large JSON environment variable, a private file can be included in a manual server deployment instead. Until the JSON and access key are configured, the directory will report that it is unavailable rather than showing invented employees.
+
 ## Employee directory & Main Office seat assignment
 
 **New on Main Office Floors 1–3:** search active employees by name, employee code or ID; select a seat and open **ASSIGN / MOVE**; assign, move, swap, replace or clear an employee. Each floor saves assignments **in that browser only**, preserving legacy name-only assignments. These are **not yet shared through MongoDB**; Beach Office's MongoDB assignments are unaffected.
 
 **Production setup (Vercel → Settings → Environment Variables → Production):**
-- `PEOPLESIMPLE_TOKEN` — server-side PeopleSimple API bearer token; **never put this token in frontend code, GitHub, or chat**.
+- `EMPLOYEE_DIRECTORY_JSON` — private static employee JSON snapshot created by the one-time import script; **never commit real employee data to public GitHub**.
 - `EMPLOYEE_DIRECTORY_ACCESS_KEY` — a separate long random access code for staff using the directory; **do not reuse the PeopleSimple token**.
 
-Both variables are required. The `/api/employees` endpoint checks the access code before contacting PeopleSimple and returns only active employee names/IDs/codes. Authorized users click **ACCESS EMPLOYEE LIST** and enter the separate access code, which is held in their browser session. Without these variables, the employee list shows a configuration error rather than exposing data. Employee IDs in seating assignments remain local to the browser.
+The static JSON snapshot and access code are required. The `/api/employees` endpoint checks the access code before reading the saved employee JSON and returns only the stored employee names/IDs/codes. Authorized users click **ACCESS EMPLOYEE LIST** and enter the separate access code, which is held in their browser session. Without these variables, the employee list shows a configuration error rather than exposing data. Employee IDs in seating assignments remain local to the browser.
 
 To validate the source: `npm run check`.
 

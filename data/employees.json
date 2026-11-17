@@ -1,0 +1,150 @@
+{
+  "source": "Beach Office assigned names snapshot (not complete company roster)",
+  "employees": [
+    {
+      "id": "beach-001",
+      "name": "Aparna",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-002",
+      "name": "Bindhu",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-003",
+      "name": "Divakar",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-004",
+      "name": "Hemalatha",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-005",
+      "name": "Jahnavi",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-006",
+      "name": "John",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-007",
+      "name": "Joseph",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-008",
+      "name": "Jyothi Sankar",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-009",
+      "name": "Kamesh",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-010",
+      "name": "Karthik",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-011",
+      "name": "Kishore",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-012",
+      "name": "Kusuma",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-013",
+      "name": "Mani",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-014",
+      "name": "Mohan Krishna",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-015",
+      "name": "Mounica",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-016",
+      "name": "Murali",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-017",
+      "name": "Prasad",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-018",
+      "name": "Prasanna",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-019",
+      "name": "Rajesh Bokka",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-020",
+      "name": "Rajeswari",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-021",
+      "name": "Ravi Sai",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-022",
+      "name": "Sai Jami",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-023",
+      "name": "Sai Krishna",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-024",
+      "name": "Sakunthala",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-025",
+      "name": "Shiva",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-026",
+      "name": "Uday",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-027",
+      "name": "Uppendra",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-028",
+      "name": "Venkatesh",
+      "employeeCode": ""
+    },
+    {
+      "id": "beach-029",
+      "name": "Vijay Babu",
+      "employeeCode": ""
+    }
+  ]
+}

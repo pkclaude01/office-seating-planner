@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/><meta name="theme-color" content="#0a0e18"/><meta name="referrer" content="no-referrer"/><title>Hush — Private Rooms</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%237b6cff'/%3E%3Cpath d='M25 50a25 25 0 0 1 50 0v22H25z' fill='white'/%3E%3Ccircle cx='50' cy='49' r='7' fill='%237b6cff'/%3E%3C/svg%3E"/><style>:root{color-scheme:dark;--bg:#090d17;--panel:#121725;--border:#292d40;--fg:#f3f3fa;--muted:#9296aa;--accent:#9784ff;--mint:#88f1d2}*{box-sizing:border-box}html{height:100%}body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none!important}.orb{position:fixed;z-index:-1;pointer-events:none;border-radius:50%;filter:blur(100px)}.orb-a{width:550px;height:550px;top:-280px;left:-160px;background:#3b275d88}.orb-b{width:450px;height:450px;bottom:-260px;right:-130px;background:#182d5488}.shell{max-width:1240px;margin:auto;padding:0 38px;min-height:100vh;display:flex;flex-direction:column}.topbar{height:95px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff12}.brand{font-size:30px;font-weight:820;letter-spacing:-1.8px;display:flex;align-items:center;gap:11px}.brandmark{display:grid;place-items:center;background:#9177ff;color:white;font-size:29px;width:37px;height:37px;border-radius:11px}.dot{color:var(--accent)}.topright{display:flex;align-items:center;gap:16px}.badge{font-size:12px;display:flex;align-items:center;gap:9px;border:1px solid #35384b;border-radius:30px;padding:9px 14px;color:#b8bac8}.badge i,.pill-dot{display:inline-block;width:7px;height:7px;background:#7aeac3;border-radius:50%;box-shadow:0 0 12px #7aeac3}.iconbtn{background:transparent;border:1px solid #363b50;border-radius:11px;color:#bfc0d2;width:36px;height:36px}.landing{display:grid;grid-template-columns:1.02fr .98fr;gap:75px;align-items:center;flex:1;padding:70px 0 75px}.eyebrow{font-size:11px;letter-spacing:2px;font-weight:740;color:#b0a4fd}.spark{font-size:20px;margin-right:7px}.intro h1{font-size:clamp(45px,4.9vw,73px);letter-spacing:-3.4px;line-height:1.09;margin:25px 0}.intro h1 em{font-style:normal;background:linear-gradient(110deg,#c3aeff,#8c74ec);color:transparent;background-clip:text}.intro>p{color:#a6a9bb;font-size:17px;line-height:1.82;max-width:505px}.features{display:flex;gap:14px;flex-wrap:wrap;margin-top:35px}.features span{font-size:12px;padding:9px 12px;background:#1b2030;border:1px solid #303345;border-radius:9px;color:#c6c3d5}.card{background:linear-gradient(140deg,#171b2a,#101522);border:1px solid #343449;border-radius:22px;box-shadow:0 18px 70px #00000026}.entry{padding:31px 34px}.card-heading{display:flex;align-items:center;gap:14px;margin-bottom:27px}.small-icon{background:#292241;color:#bdadff;display:grid;place-items:center;border:1px solid #46356e;border-radius:13px;font-size:27px;width:47px;height:47px}.card-heading h2{font-size:19px;letter-spacing:-.4px;margin:0 0 5px}.card-heading p,.muted{color:#82899e;font-size:12px;margin:0}.entry label{font-weight:600;display:block;font-size:12px;color:#d9dae7;margin:19px 0 9px}.field{display:flex;align-items:center;gap:10px;border:1px solid #343849;background:#0d121e;border-radius:11px;padding:0 14px;height:49px;min-width:0;color:#8d86aa}.field:focus-within{border-color:#9381fb;box-shadow:0 0 0 3px #957bff16}.field input{width:100%;background:transparent;border:0;outline:0;color:#e9e7f4;font-size:13px;min-width:0}.field input::placeholder{color:#73768a}.eye{border:0;background:none;color:#9295aa;font-size:19px}.actionstack{margin-top:25px}.primary,.secondary,.invite,.leave{border:0;border-radius:11px;font-size:13px;font-weight:700}.primary{width:100%;height:49px;color:white;background:linear-gradient(110deg,#8064ea,#a184ff);display:flex;justify-content:center;align-items:center;gap:12px}.primary:hover{filter:brightness(1.1)}.split{display:flex;align-items:center;gap:12px;color:#797c90;font-size:11px;margin:21px 0}.split:before,.split:after{content:"";height:1px;background:#303446;flex:1}.joinrow{display:flex;gap:10px}.joinrow .field{flex:1;min-width:0}.secondary{white-space:nowrap;background:#29283e;color:#e9e2ff;border:1px solid #514a74;padding:0 17px}.secondary:hover{background:#3c345c}.error{color:#ff9aa3;font-size:12px;min-height:13px}.card-footer{border-top:1px solid #2b2c3e;padding-top:19px;color:#7e879b;font-size:11px;display:flex;gap:8px}.footer{padding:20px 0 27px;color:#686b81;text-align:center;font-size:10px;letter-spacing:1.8px}.footer span{color:#9678ef;margin:0 10px}.footer a{color:inherit}.chat{display:grid;grid-template-columns:290px 1fr;gap:17px;flex:1;min-height:0;height:calc(100dvh - 170px);padding:24px 0}.side{display:flex;flex-direction:column;padding:23px}.section-cap,.members-head{font-size:10px;letter-spacing:1.5px;color:#9193ab;font-weight:750}.room-title{display:flex;gap:12px;align-items:center;margin:23px 0}.room-emoji{height:43px;width:43px;border-radius:13px;background:#342858;display:grid;place-items:center;color:#c0aaff;font-size:24px}.room-title h2{font-size:18px;margin:0 0 4px}.room-title p{font-size:12px;letter-spacing:2px;color:#a9a2cb;margin:0}.secure{display:flex;align-items:center;gap:10px;border:1px solid #245344;background:#15342c63;padding:12px;border-radius:11px;color:#7fe3b8}.secure span{font-size:21px}.secure strong,.secure small{display:block;font-size:11px}.secure small{color:#84a99c;font-size:10px;margin-top:4px}.members-head{display:flex;justify-content:space-between;border-top:1px solid #2d3241;padding-top:25px;margin-top:25px}.members-head span:last-child{color:#8aebc9;letter-spacing:0}.memberlist{padding:15px 0;flex:1;overflow:auto}.member{display:flex;gap:10px;align-items:center;padding:8px 0;font-size:13px}.member .av{width:32px;height:32px;display:grid;place-items:center;background:#30294b;border-radius:10px;color:#c5b5ff;font-size:13px}.member small{color:#7e879a;font-size:11px;margin-left:auto}.side-bottom{border-top:1px solid #2d3241;padding-top:18px}.invite,.leave{height:42px;width:100%}.invite{background:#40346f;color:#e8dfff}.leave{background:transparent;color:#a5a9be;margin-top:6px}.side-bottom p{font-size:10px;color:#747b8d;text-align:center;line-height:1.7}.conversation{display:flex;flex-direction:column;overflow:hidden;min-height:0}.conversation-header{padding:18px 25px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2d3140}.room-mob{display:flex;gap:12px;align-items:center}.room-mob .avatar{display:grid;place-items:center;background:#2b254b;border-radius:12px;color:#ad96ff;width:41px;height:41px;font-size:24px}.room-mob strong{display:block;font-size:14px}.room-mob span:last-child{display:block;margin-top:5px;font-size:11px;color:#8b93a5}.pill{border:1px solid #35594e;background:#18372c;color:#9de4ce;font-size:10px;border-radius:50px;padding:8px 11px}.pill-dot{width:6px;height:6px;margin-right:5px}.messages{flex:1;min-height:0;overflow:auto;padding:24px 27px;display:flex;flex-direction:column;gap:16px;scrollbar-color:#38384c transparent}.empty-state{margin:auto;text-align:center;max-width:310px;color:#8d92a7}.empty-icon{font-size:44px;color:#9380e8}.empty-state h3{color:#dbd8ea;font-size:19px}.empty-state p{font-size:12px;line-height:1.8}.bubble-wrap{display:flex;gap:9px;max-width:80%;align-items:end}.bubble-wrap.mine{margin-left:auto;flex-direction:row-reverse}.bubble-avatar{width:26px;height:26px;display:grid;place-items:center;background:#36304b;border-radius:9px;color:#c7afff;font-size:11px;flex-shrink:0}.bubble-meta{font-size:10px;color:#85899d;margin-bottom:6px}.bubble-wrap.mine .bubble-meta{text-align:right}.bubble{background:#24283a;border:1px solid #33394f;border-radius:14px 14px 14px 4px;padding:11px 14px;line-height:1.55;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}.mine .bubble{background:#51438b;border-color:#6655a8;border-radius:14px 14px 4px 14px}.bubble-time{color:#8d91a4;font-size:10px;margin-top:6px}.mine .bubble-time{text-align:right}.typing{font-size:11px;color:#9892b6;padding-left:25px}.composer{padding:15px 22px 5px;display:flex;gap:9px}.compose-field{height:50px;border-radius:13px;background:#0e1320;border:1px solid #33384d;display:flex;align-items:center;padding:0 15px;flex:1;min-width:0}.compose-field:focus-within{border-color:#9480fb}.compose-field input{border:0;background:transparent;outline:0;flex:1;min-width:0;color:white;font-size:13px}.compose-field input::placeholder{color:#777b90}.timer-hint{font-size:11px;color:#827e9a;white-space:nowrap}.send{width:50px;border:0;border-radius:13px;background:#8e72f1;color:white;font-size:21px}.compose-note{text-align:center;font-size:10px;color:#797e93;padding:8px 10px 18px}.mobile-only{display:none}dialog{border:1px solid #4b4765;background:#171b2b;color:white;border-radius:18px;width:min(450px,92vw);padding:0;box-shadow:0 25px 100px #0009}dialog::backdrop{background:#02040bc9}.modal-content{padding:25px}.modal-title{display:flex;justify-content:space-between;align-items:center}.modal-title h2{margin:0;font-size:20px}.modal-content p,.modal-content li{font-size:13px;line-height:1.8;color:#a5a9bb}.modal-content code{color:#c9b7ff}.modal-content .primary{margin-top:16px}#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:11px;background:#343051;color:#fff;font-size:12px;box-shadow:0 10px 40px #0005;display:none;max-width:90vw;text-align:center}body.light{--bg:#eff0fa;--fg:#1b2040;--muted:#555b6b}body.light .card{background:#fff}body.light .intro>p,body.light .entry label{color:#51566c}body.light .field,body.light .compose-field{background:#f3f2fa}body.light input{color:#222}body.light .topbar{border-color:#c7c7dd}body.light .bubble{color:white}body.light .empty-state h3,body.light .room-mob strong{color:#20243d}body.light .room-title h2,body.light .card-heading h2{color:#20243d}body.light .brand{color:#252943}@media(max-width:950px){.landing{gap:35px}.intro h1{font-size:48px}.shell{padding:0 22px}.entry{padding:26px 23px}.chat{grid-template-columns:250px 1fr}}@media(max-width:730px){.shell{padding:0 16px}.topbar{height:73px}.brand{font-size:25px}.badge{font-size:10px;padding:8px}.landing{grid-template-columns:1fr;gap:30px;padding:55px 0}.intro h1{font-size:clamp(39px,9vw,58px);letter-spacing:-2px}.intro>p{font-size:14px}.features{margin-top:22px}.entry{max-width:540px;width:100%;margin:auto}.chat{grid-template-columns:1fr;height:calc(100dvh - 120px);padding:12px 0}.side{display:none}.side.active{display:flex;position:fixed;z-index:5;inset:75px 16px 70px;background:#131727}.mobile-only{display:block}.pill{display:none}.conversation-header{padding:12px 15px}.messages{padding:17px 12px}.bubble-wrap{max-width:92%}.composer{padding:12px 10px 5px}.compose-note{font-size:9px}.footer{padding:12px 0;font-size:8px;letter-spacing:1px}.footer span{margin:0 4px}}@media(max-width:370px){.joinrow{flex-direction:column}.secondary{height:45px}.card-heading h2{font-size:16px}}
+</style><script defer src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js" integrity="sha512-Vu+3Y/iFEqHnwrYwXCrOpPmiWoC21iK9ZQLy5f0wcbBSpPrZZZz0vtB7lCPYt+LJnc59RtR3B87Ko5XbRmg==" crossorigin="anonymous" onerror="window.peerScriptFailed=true"></script></head>
+<body><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="shell">
+<header class="topbar"><div class="brand"><span class="brandmark">◈</span><span>hush<span class="dot">.</span></span></div><div class="topright"><span class="badge"><i></i> No message history</span><button id="themeBtn" class="iconbtn" aria-label="Toggle contrast">☾</button></div></header>
+<main id="landing" class="landing"><div class="intro"><span class="eyebrow"><span class="spark">✦</span> THE INTERNET, WITH THE DOOR CLOSED</span><h1>Some conversations<br/>are meant to <em>disappear.</em></h1><p>Real-time, peer-to-peer encrypted chat. No account. No saved messages. Just you and the people you invite.</p><div class="features"><span>⌁ &nbsp;Direct connections</span><span>◷ &nbsp;15-minute vanish</span><span>♧ &nbsp;No chat database</span></div></div><section class="entry card"><div class="card-heading"><span class="small-icon">✳</span><div><h2>Start a private conversation</h2><p>Your identity exists only in this browser tab.</p></div></div><label for="username">Your display name</label><div class="field"><span>＠</span><input id="username" maxlength="24" autocomplete="off" spellcheck="false" placeholder="e.g. moonwalker"/></div><label for="roomPassword">Room password <span class="muted">(shared with invited people)</span></label><div class="field"><span>♢</span><input id="roomPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters"/><button id="eyeBtn" class="eye" aria-label="Show password" type="button">◉</button></div><div class="actionstack"><button id="createBtn" class="primary">Create private room <span>↗</span></button><div class="split"><span>or join an existing room</span></div><div class="joinrow"><div class="field"><span>#</span><input id="roomInput" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="Enter room ID"/></div><button id="joinBtn" class="secondary">Join room →</button></div></div><p id="entryError" class="error" role="alert"></p><div class="card-footer"><span>♧</span> No sign-up, cookies, analytics, or message storage.</div></section></main>
+<section id="chat" class="chat hidden" aria-label="Private room"><aside class="side card"><div class="room-top"><span class="section-cap">YOUR PRIVATE SPACE</span><div class="room-title"><span class="room-emoji">◈</span><div><h2>Secret Room</h2><p id="roomCodeText">••••••••</p></div></div><div class="secure"><span>✧</span><div><strong>Encrypted in your browser</strong><small>Messages aren't saved on a server</small></div></div></div><div class="members-head"><span>PEOPLE IN ROOM</span><span id="memberCount">1 online</span></div><div id="members" class="memberlist"></div><div class="side-bottom"><button id="copyInviteBtn" class="invite">⎘ &nbsp; Copy invite link</button><button id="leaveBtn" class="leave">↪ &nbsp; Leave room</button><p>Your room closes when its creator leaves.</p></div></aside><div class="conversation card"><div class="conversation-header"><div class="room-mob"><span class="avatar">◈</span><div><strong>Private conversation</strong><span id="statusText">Connecting…</span></div></div><div class="header-actions"><span class="pill"><span class="pill-dot"></span> End-to-end encrypted</span><button id="showRoomBtn" class="iconbtn mobile-only" aria-label="Room details">☷</button></div></div><div id="messages" class="messages"><div class="empty-state"><div class="empty-icon">✳</div><h3>Nothing here. That's the point.</h3><p>Say hello. Once a message is viewed, its 15-minute countdown begins.</p></div></div><div id="typing" class="typing hidden">Someone is typing…</div><form id="sendForm" class="composer"><div class="compose-field"><input id="messageInput" maxlength="4000" autocomplete="off" placeholder="Write something worth sharing…" aria-label="Message"/><span class="timer-hint">◷ 15m</span></div><button class="send" type="submit" title="Send message">➤</button></form><div class="compose-note">✦ Messages vanish 15 minutes after being shown in each participant's open tab.</div></div></section>
+<footer class="footer">BUILT FOR MOMENTS, NOT RECORDS <span>·</span> P2P WHEN CONNECTED <span>·</span> <a href="#privacy" id="privacyLink">PRIVACY DETAILS</a></footer></div>
+<dialog id="modal"><div class="modal-content"><div class="modal-title"><h2 id="modalHeading">Room information</h2><button id="closeModal" class="iconbtn">✕</button></div><div id="modalBody"></div></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div><script>/* Hush: browser-only, ephemeral chat. No analytics, cookies, storage, or backend message writes. */
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const TTL = 15 * 60 * 1000;
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+const state = {peer:null, connections:new Map(), host:false, id:'', username:'', key:null, messages:new Map(), members:new Map(), connected:false, closed:false, timers:new Map()};
+const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
+const randomId = (len=10) => {const a=crypto.getRandomValues(new Uint8Array(len)); return [...a].map(x => alphabet[x % alphabet.length]).join('');};
+const base64 = bytes => btoa(String.fromCharCode(...bytes));
+const bytes = b64 => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+const notify = msg => {const el=$('toast');el.textContent=msg;el.style.display='block';clearTimeout(notify.t); notify.t=setTimeout(()=>el.style.display='none',3600);};
+const setError = msg => $('entryError').textContent=msg;
+const setStatus = str => $('statusText').textContent=str;
+const html = str => String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function buildInvite(){return `${location.origin}${location.pathname}?room=${encodeURIComponent(state.id)}`;}
+async function deriveKey(password,room){
+ const material=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveKey']);
+ return crypto.subtle.deriveKey({name:'PBKDF2',salt:encoder.encode('hush-room-v1:'+room),iterations:210000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encrypt(obj){const iv=crypto.getRandomValues(new Uint8Array(12));const plain=encoder.encode(JSON.stringify(obj));const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},state.key,plain);return {iv:base64(iv),ct:base64(new Uint8Array(cipher))};}
+async function decrypt(packet){const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packet.iv)},state.key,bytes(packet.ct));return JSON.parse(decoder.decode(plain));}
+function validName(n){return /^[\p{L}\p{N}_ .-]{2,24}$/u.test(n);}
+function validate(room){
+ let username=$('username').value.trim(), password=$('roomPassword').value;
+ if(!validName(username)){setError('Choose a 2–24 character name (letters, numbers, spaces, _, . or -).');return null;}
+ if(password.length<8){setError('Use a room password with at least 8 characters. A long, unique phrase is best.');return null;}
+ if(room && !/^[a-z2-9]{10}$/.test(room)){setError('Room IDs contain 10 lowercase letters or digits.');return null;}
+ setError('');return {username,password};
+}
+function avatar(name){return [...name][0]?.toUpperCase()||'?';}
+function renderMembers(){
+ const list=[{name:state.username,me:true},...Array.from(state.members.values())];
+ $('memberCount').textContent=`${list.length} online`;
+ $('members').innerHTML=list.map(m=>`<div class="member"><div class="av">${html(avatar(m.name))}</div><strong>${html(m.name)}</strong>${m.me?'<small>you</small>':''}</div>`).join('');
+}
+function renderMessages(){
+ const list=$('messages');
+ const active=[...state.messages.values()].sort((a,b)=>a.at-b.at);
+ if(!active.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">✳</div><h3>Nothing here. That\'s the point.</h3><p>Say hello. Once a message is viewed, its 15-minute countdown begins.</p></div>';return;}
+ list.innerHTML=active.map(m=>`<div class="bubble-wrap ${m.mine?'mine':''}"><span class="bubble-avatar">${html(avatar(m.from))}</span><div><div class="bubble-meta">${html(m.from)} ${m.mine?'· you':''}</div><div class="bubble">${html(m.text)}</div><div class="bubble-time">${new Date(m.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · ◷ ${Math.max(1,Math.ceil((m.expires-Date.now())/60000))}m</div></div></div>`).join('');
+ list.scrollTop=list.scrollHeight;
+}
+function addMessage(msg,mine){
+ if(typeof msg.id!=='string'||typeof msg.text!=='string'||typeof msg.from!=='string'||msg.text.length>4000||state.messages.has(msg.id))return;
+ const at=Date.now(), expires=at+TTL;
+ state.messages.set(msg.id,{...msg,mine,at,expires});
+ renderMessages();
+ const t=setTimeout(()=>{state.messages.delete(msg.id);state.timers.delete(msg.id);renderMessages();},TTL);
+ state.timers.set(msg.id,t);
+}
+function sendPacket(conn,packet){if(conn?.open)conn.send(packet);}
+async function sendEncrypted(conn,obj){try{sendPacket(conn,await encrypt(obj));}catch(e){console.warn('Encryption or transmission failed',e);}}
+async function broadcast(obj,except){const packet=await encrypt(obj);for(const [id,conn] of state.connections)if(id!==except && conn.open)sendPacket(conn,packet);}
+async function handle(conn,packet){
+ if(!packet||typeof packet.iv!=='string'||typeof packet.ct!=='string'||packet.ct.length>20000)return;
+ let msg;try{msg=await decrypt(packet);}catch{notify('Incorrect room password or invalid encrypted message.'); if(!state.host){conn.close();leave(true);}else conn.close();return;}
+ if(!msg||typeof msg.type!=='string')return;
+ if(msg.type==='hello'&&state.host){
+  const name=String(msg.name||'').trim();
+  if(!validName(name)||[state.username,...[...state.members.values()].map(x=>x.name)].some(x=>x.toLowerCase()===name.toLowerCase())){await sendEncrypted(conn,{type:'error',message:'That username is already in this room or is invalid.'});setTimeout(()=>conn.close(),100);return;}
+  state.members.set(conn.peer,{name});renderMembers();
+  await sendEncrypted(conn,{type:'welcome',peers:[{name:state.username},...Array.from(state.members.values())]});
+  await broadcast({type:'member-join',name},conn.peer);notify(`${name} joined the room`);return;
+ }
+ if(msg.type==='welcome'&&!state.host){state.connected=true;setStatus('Connected · private room');state.members.clear();for(const m of msg.peers||[])if(validName(m.name)&&m.name!==state.username)state.members.set(m.name,{name:m.name});renderMembers();notify('Room joined securely');return;}
+ if(msg.type==='error'){notify(String(msg.message||'Room connection rejected')); if(!state.host)leave(true);return;}
+ if(msg.type==='member-join'&&!state.host){const name=String(msg.name||'');if(validName(name))state.members.set(name,{name});renderMembers();return;}
+ if(msg.type==='member-leave'&&!state.host){state.members.delete(msg.name);renderMembers();return;}
+ if(msg.type==='chat'){
+  if(typeof msg.id!=='string'||!/^[a-z2-9]{16}$/.test(msg.id)||!validName(msg.from)||typeof msg.text!=='string'||msg.text.length>4000)return;
+  if(state.host){const sender=state.members.get(conn.peer);if(!sender||sender.name!==msg.from)return;await broadcast(msg,conn.peer);}
+  addMessage(msg,false);return;
+ }
+}
+function setupConn(conn){
+ state.connections.set(conn.peer,conn);
+ conn.on('data',packet=>{handle(conn,packet).catch(()=>notify('Could not decode a message'));});
+ conn.on('close',()=>{
+   state.connections.delete(conn.peer);
+   if(state.host){const member=state.members.get(conn.peer);if(member){state.members.delete(conn.peer);renderMembers();broadcast({type:'member-leave',name:member.name}).catch(()=>{});}}
+   else if(!state.closed){setStatus('Room closed · host disconnected');state.connected=false;state.members.clear();renderMembers();notify('The room creator disconnected. This room is now closed.');}
+ });
+ conn.on('error',()=>notify('Connection error. Try rejoining.'));
+}
+function showChat(){
+ $('landing').classList.add('hidden');$('chat').classList.remove('hidden');$('roomCodeText').textContent=state.id.toUpperCase();renderMembers();
+ history.replaceState(null,'',`${location.pathname}?room=${state.id}`);
+}
+async function begin(host){
+ if(typeof Peer==='undefined'){setError('Connection library unavailable. Check your network or content blocker and reload.');return;}
+ const id=host?randomId():$('roomInput').value.toLowerCase().trim();
+ const cred=validate(id);if(!cred)return;
+ $('createBtn').disabled=true;$('joinBtn').disabled=true;
+ try{
+  state.host=host;state.id=id;state.username=cred.username;state.key=await deriveKey(cred.password,id);state.closed=false;state.connected=false;
+  // PeerJS cloud provides signaling only. DataChannel carries encrypted chat messages directly through WebRTC.
+  const peer=new Peer(host?'hush-room-'+id:undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});
+  state.peer=peer;
+  peer.on('open',()=>{
+   showChat();
+   if(host){state.connected=true;setStatus('Room ready · invite someone');notify('Room created. Share ID and password separately.');}
+   else{
+    setStatus('Connecting to host…');
+    const conn=peer.connect('hush-room-'+id,{reliable:true,serialization:'json'});
+    setupConn(conn);conn.on('open',()=>sendEncrypted(conn,{type:'hello',name:state.username}));
+    setTimeout(()=>{if(!state.connected&&!state.closed)notify('Still connecting. The creator must be online and the room password must match.');},12000);
+   }
+  });
+  peer.on('connection',conn=>{
+   if(!state.host){conn.close();return;}
+   setupConn(conn);
+  });
+  peer.on('error',err=>{
+   const msg=err.type==='unavailable-id'?'Room ID collision. Try creating a new one.':err.type==='peer-unavailable'?'Room not found. The creator must be online.':'Could not connect to the peer signaling service.';
+   notify(msg);setStatus(msg);
+   if($('chat').classList.contains('hidden'))setError(msg);
+  });
+  peer.on('disconnected',()=>{if(!state.closed)setStatus('Signaling disconnected · active peers may remain connected');});
+ }catch(e){setError('Could not start encrypted room. Use HTTPS and try again.');console.warn(e);}
+ finally{$('createBtn').disabled=false;$('joinBtn').disabled=false;}
+}
+function leave(silent=false){
+ state.closed=true;
+ try{state.peer?.destroy();}catch{}
+ for(const t of state.timers.values())clearTimeout(t);
+ state.timers.clear();state.connections.clear();state.members.clear();state.messages.clear();state.key=null;state.peer=null;state.connected=false;
+ $('chat').classList.add('hidden');$('landing').classList.remove('hidden');$('side')?.classList.remove('active');$('roomPassword').value='';$('messageInput').value='';
+ history.replaceState(null,'',location.pathname);
+ if(!silent)notify('You left the room. Messages cleared from this tab.');
+}
+async function sendMessage(e){
+ e.preventDefault();const text=$('messageInput').value.trim();if(!text||!state.connected)return;
+ const msg={type:'chat',id:randomId(16),from:state.username,text};
+ if(state.host)await broadcast(msg);
+ else{const conn=[...state.connections.values()].find(c=>c.open);if(!conn){notify('Not connected to room');return;}await sendEncrypted(conn,msg);}
+ addMessage(msg,true);$('messageInput').value='';$('messageInput').focus();
+}
+$('createBtn').addEventListener('click',()=>begin(true));$('joinBtn').addEventListener('click',()=>begin(false));$('sendForm').addEventListener('submit',sendMessage);
+$('eyeBtn').addEventListener('click',()=>{const p=$('roomPassword');p.type=p.type==='password'?'text':'password';});
+$('leaveBtn').addEventListener('click',()=>leave());
+$('showRoomBtn').addEventListener('click',()=>$('side').classList.toggle('active'));
+$('copyInviteBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(buildInvite());notify('Invite link copied. Send the room password separately.');}catch{notify('Could not copy. Your room link is '+buildInvite());}});
+$('themeBtn').addEventListener('click',()=>document.body.classList.toggle('light'));
+$('privacyLink').addEventListener('click',e=>{e.preventDefault();openModal('How private is Hush?',`<p><strong>No account or chat database.</strong> Usernames, passwords and message content remain in browser memory only. Reloading or leaving loses your conversation.</p><p>Room messages are encrypted with AES-GCM using a key derived from the shared room password (PBKDF2). The peer-to-peer signaling provider and STUN service may observe connection metadata such as IP addresses, room identifiers and connection timing, but not chat plaintext.</p><p><strong>15-minute expiry:</strong> The countdown begins when a message is displayed in each connected tab. Timers and deletion are client-side; screenshots, browser extensions, modified clients and copied messages cannot be prevented. Offline messages are never queued.</p><p>WebRTC may not connect across restrictive networks without a TURN relay. The room creator must stay connected. Use a strong, unique room password, sent separately from the invite link.</p>`);});
+function openModal(title,body){$('modalHeading').textContent=title;$('modalBody').innerHTML=body;$('modal').showModal();}
+$('closeModal').addEventListener('click',()=>$('modal').close());
+window.addEventListener('beforeunload',()=>{try{state.peer?.destroy();}catch{}});
+const params=new URLSearchParams(location.search),room=params.get('room');if(room&&/^[a-z2-9]{10}$/.test(room)){$('roomInput').value=room;$('roomInput').focus();}
+})();
+</script></body></html>

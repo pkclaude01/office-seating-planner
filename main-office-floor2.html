@@ -68,6 +68,22 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ffb5
 
 
 .office-global-header{position:absolute;top:0;left:0;right:0;z-index:30}.top{top:76px}#panel{top:190px}@media(max-width:760px){.top{top:112px}#panel{top:auto}}
+
+.seat[aria-pressed=true]{box-shadow:0 0 0 2px #fff;background:#7fc4ff;color:#06182c}
+#assignment-current{background:#173d5f;padding:12px;border-radius:6px;color:#d7eaff;margin-bottom:14px}
+.employee-row{display:flex;flex-direction:column;gap:5px;width:100%;text-align:left;padding:10px;margin:5px 0;background:#102c46;color:#fff;border:1px solid #335a7b;border-radius:5px;cursor:pointer}
+.employee-row span{font-size:11px;color:#a1c7e6;overflow-wrap:anywhere}
+.employee-row[aria-pressed=true]{border:2px solid #ffb547;background:#244968}
+#assignment-dialog{width:min(560px,calc(100vw - 32px));max-height:85vh;box-sizing:border-box;background:#0a1d33;color:#fff;border:1px solid #7fc4ff;border-radius:12px;padding:20px}
+#assignment-dialog::backdrop{background:#0009}
+#assignment-dialog input{box-sizing:border-box;width:100%;padding:10px;background:#132e48;color:#fff;border:1px solid #52799b;border-radius:5px;margin:6px 0 12px}
+#assignment-dialog label{font-size:12px;color:#bfe3ff}
+#assignment-employees{height:220px;overflow:auto;border-block:1px solid #335a7b}
+#assignment-note{font-size:12px;color:#bfe3ff;min-height:30px}
+.assignment-actions{display:flex;gap:8px;flex-wrap:wrap}
+#assignment-dialog button:disabled{opacity:.4;cursor:default}
+.assignment-help{margin-top:8px;font-size:12px;line-height:1.4;color:#a9cee9}
+
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 </head>
@@ -94,7 +110,8 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ffb5
 </div>
 
 <div id="panel">
-  <div style="padding:12px;border-bottom:1px solid rgba(127,196,255,.18)"><input id="q" type="search" placeholder="Find a person…" aria-label="Find a person or seat"></div>
+  <div style="padding:12px;border-bottom:1px solid rgba(127,196,255,.18)"><input id="q" type="search" placeholder="Find a person… name or ID" aria-label="Find a person or seat"></div>
+  <button id="directory-login" class="btn" type="button" hidden style="margin:5px 12px">ACCESS EMPLOYEE LIST</button><div id="person-results" hidden style="max-height:38%;overflow:auto;padding:0 12px"></div>
   <div id="list"></div>
   <div class="legend"><span><i style="background:#7fc4ff"></i>Assigned</span><span><i style="border:1px dashed #ffb547"></i>Open seat</span></div>
 </div>
@@ -107,13 +124,23 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ffb5
 
 <div id="sel" hidden>
   <div style="display:flex;flex-direction:column;gap:3px"><div id="sel-meta"></div><div id="sel-name"></div></div>
-  <button id="sel-edit" style="padding:9px 13px;color:#06182c;background:#ffb547;border:0;border-radius:3px;font-weight:700;cursor:pointer;white-space:nowrap">EDIT NAME</button>
+  <button id="sel-edit" style="padding:9px 13px;color:#06182c;background:#ffb547;border:0;border-radius:3px;font-weight:700;cursor:pointer;white-space:nowrap">ASSIGN / MOVE</button>
   <button id="sel-close" aria-label="Clear selection" style="font-size:14px;width:32px;height:32px;border:1px solid rgba(127,196,255,.35);border-radius:3px;background:transparent;color:#d8ecff;cursor:pointer">×</button>
 </div>
 <div id="hint"></div>
 <div id="walk-pad" aria-label="Walk controls"><button data-key="ArrowUp" aria-label="Move forward">↑</button><button data-key="ArrowLeft" aria-label="Turn left">↶</button><button data-key="ArrowDown" aria-label="Move backward">↓</button><button data-key="ArrowRight" aria-label="Turn right">↷</button></div>
 
+<dialog id="assignment-dialog" aria-labelledby="assignment-title">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2 id="assignment-title">Assign employee</h2><button type="button" id="assignment-close" class="btn" aria-label="Close assignment dialog">×</button></div>
+  <div id="assignment-current"></div>
+  <label for="employee-search">Search employees by name or ID</label><input id="employee-search" type="search" placeholder="Name or employee ID" autocomplete="off">
+  <div id="assignment-employees"></div>
+  <p id="assignment-note" role="status"></p>
+  <div class="assignment-actions"><button type="button" class="btn" id="directory-retry" hidden>ACCESS / RETRY EMPLOYEE LIST</button><button type="button" class="btn" id="assignment-clear">CLEAR SEAT</button></div>
+</dialog>
 <script type="module">
+import {normalizeAssignments} from './main-office/assignments.mjs';
+import {createDirectory} from './main-office/directory.mjs';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
@@ -195,42 +222,25 @@ const seats = buildSeats();
 const seatName = s => s.cabin ? 'Amith cabin seat' : `${s.table} · ${s.side[0].toUpperCase() + s.side.slice(1)} ${s.idx + 1}`;
 
 // --------------------------- shared names (API with local fallback) ---------------------------
+// Floor-specific assignments preserve employee IDs, names and legacy manual entries.
 const LS = 'main-office-floor2-names-v1';
-let source = 'server', updating = false;
-const readLocal = () => { try { return JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch { return {}; } };
-const writeLocal = names => { try { localStorage.setItem(LS, JSON.stringify(names)); return true; } catch { return false; } };
-async function refreshSeats() {
-  if (updating) return;
-  let live;
-  try {
-    const r = await fetch(`/api/seats?plan=${PLAN_KEY}`, { cache: 'no-store' });
-    if (!r.ok) throw Error('Server unavailable');
-    live = (await r.json()).names || {}; source = 'server';
-  } catch { live = readLocal(); source = 'local'; }
-  let changed = false;
-  seats.forEach(s => { const n = String(live[s.key] ?? '').trim(); if (s.name !== n) { s.name = n; changed = true; } });
-  if (changed) refreshVisuals(); else renderUI();
+let source = 'local', directory;
+const readLocal = () => {
+  try { return normalizeAssignments(JSON.parse(localStorage.getItem(LS) || '{}'),seats.map(s => s.key)); }
+  catch { return {}; }
+};
+function applyAssignments(names) {
+  seats.forEach(s => {const e=names[s.key];s.name=e?.name || '';s.employeeId=e?.id || '';s.employeeCode=e?.employeeCode || '';});
+  refreshVisuals();
 }
-async function editSeat(key) {
-  const s = seats.find(x => x.key === key); if (!s || updating) return;
-  const typed = window.prompt(`Employee for ${seatName(s)}\nLeave blank to clear.`, s.name || '');
-  if (typed === null) return;
-  const name = typed.trim();
-  if (name.length > 70) { alert('Use a name with at most 70 characters.'); return; }
-  updating = true;
-  try {
-    let saved = false;
-    if (source === 'server') {
-      try {
-        const r = await fetch(`/api/seats?plan=${PLAN_KEY}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key, name }) });
-        saved = r.ok;
-      } catch { saved = false; }
-      if (!saved) source = 'local';
-    }
-    if (!saved) { const all = readLocal(); all[key] = name; if (!writeLocal(all)) { alert('Could not save the name. Try again.'); return; } }
-    s.name = name; refreshVisuals();
-  } finally { updating = false; }
+function saveAssignments(names) {
+  try {localStorage.setItem(LS,JSON.stringify(names));}
+  catch {alert('Could not save assignments on this device. No seats were changed.');return false;}
+  applyAssignments(names);return true;
 }
+async function refreshSeats() { applyAssignments(readLocal()); }
+function editSeat(key) { if(key){focusSeat(key,true);directory?.open(key);} }
+window.addEventListener('storage',e=>{if(e.key===LS)refreshSeats();});
 
 // --------------------------- scene ---------------------------
 const $ = id => document.getElementById(id), host = $('host');
@@ -593,7 +603,7 @@ function refreshVisuals() {
 // --------------------------- HUD ---------------------------
 function renderUI() {
   const used = seats.filter(s => s.name).length;
-  $('stats').textContent = `${used} of ${seats.length} seats assigned · ${seats.length - used} open` + (source === 'local' ? ' · saved on this device' : '');
+  $('stats').textContent = `${used} of ${seats.length} seats assigned · ${seats.length - used} open` + ' · saved on this device';
   document.querySelectorAll('#modes [data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
   $('walk-pad').style.display = state.mode === 'walk' ? 'grid' : 'none';
   $('hint').textContent = state.mode === 'walk' ? 'W A S D / arrows to move · Drag to look around · Mini map to jump'
@@ -602,12 +612,12 @@ function renderUI() {
   $('mini-hint').textContent = state.mode === 'walk' ? 'Click to jump to a spot' : 'Click to recenter the view';
   const sel = seats.find(s => s.key === state.selKey);
   $('sel').hidden = !sel;
-  if (sel) { $('sel-meta').textContent = seatName(sel).toUpperCase(); $('sel-name').textContent = sel.name || 'Open seat'; $('sel-name').style.color = sel.name ? '#fff' : '#ffb547'; }
+  if (sel) { $('sel-meta').textContent = seatName(sel).toUpperCase(); $('sel-name').textContent = sel.name ? sel.name + (sel.employeeCode ? ' · '+sel.employeeCode : '') : 'Open seat'; $('sel-name').style.color = sel.name ? '#fff' : '#ffb547'; }
   const q = state.q.trim().toLowerCase(), list = $('list'); list.replaceChildren();
   const groups = [...TABLES.map(t => ({ id: t.id, title: t.collab ? 'TABLE 1 · COLLAB' : 'TABLE ' + t.id.slice(1), sides: t.vertical ? [['left', 'LEFT SIDE'], ['right', 'RIGHT SIDE']] : [['top', 'TOP SIDE'], ['bottom', 'BOTTOM SIDE']] })), { id: 'CB', title: 'AMITH CABIN', sides: [['desk', 'DESK']] }];
   groups.forEach(g => {
     const all = seats.filter(s => s.table === g.id);
-    const blocks = g.sides.map(([side, label]) => [label, all.filter(s => s.side === side && (!q || (s.name || '').toLowerCase().includes(q) || seatName(s).toLowerCase().includes(q)))]).filter(([, a]) => a.length);
+    const blocks = g.sides.map(([side, label]) => [label, all.filter(s => s.side === side && (!q || (s.name || '').toLowerCase().includes(q) || (s.employeeCode || '').toLowerCase().includes(q) || (s.employeeId || '').toLowerCase().includes(q) || seatName(s).toLowerCase().includes(q)))]).filter(([, a]) => a.length);
     if (!blocks.length) return;
     const wrap = document.createElement('div'); wrap.className = 'tbl';
     const h = document.createElement('div'); h.className = 'tbl-h';
@@ -617,7 +627,7 @@ function renderUI() {
       const sd = document.createElement('div'); sd.className = 'side'; sd.textContent = label; wrap.append(sd);
       const gr = document.createElement('div'); gr.className = 'grid';
       arr.forEach(s => {
-        const sel = s.key === state.selKey, btn = document.createElement('button'); btn.className = 'seat';
+        const sel = s.key === state.selKey, btn = document.createElement('button'); btn.className = 'seat'; btn.setAttribute('aria-pressed',String(sel));
         btn.textContent = (s.cabin ? 'C1' : 'S' + (s.idx + 1)) + ' · ' + (s.name || 'Empty'); btn.title = 'Select seat; double-click to edit';
         btn.style.background = sel ? '#7fc4ff' : s.name ? 'rgba(127,196,255,.12)' : 'rgba(255,181,71,.05)';
         btn.style.color = sel ? '#06182c' : s.name ? '#e4f0ff' : '#ffb547';
@@ -629,6 +639,7 @@ function renderUI() {
     });
     list.append(wrap);
   });
+  directory?.render();
 }
 document.querySelectorAll('#modes [data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
 $('labels-btn').onclick = () => { state.labels = !state.labels; $('labels-btn').textContent = state.labels ? 'DESK LABELS ON' : 'DESK LABELS OFF'; styleLabels(); };
@@ -732,6 +743,7 @@ setMode(['plan', 'orbit', 'walk'].includes(startMode) ? startMode : 'plan', true
 refreshVisuals();
 refreshSeats();
 setInterval(refreshSeats, 5000);
+directory = createDirectory({seats,seatName,selectedSeat:()=>state.selKey,read:readLocal,save:saveAssignments,focusSeat});
 renderer.setAnimationLoop(loop);
 </script>
 </body>

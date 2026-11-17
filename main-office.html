@@ -24,7 +24,7 @@ main{max-width:1420px;margin:auto;padding:25px 24px 50px}
 .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px}
 .empty-content{max-width:470px}.empty-icon{font-size:57px;color:#4676c0}.empty h2{font-size:23px;margin:8px 0}.empty p{font-size:14px;color:#6b8199;line-height:1.7}
 .seat-pin{position:absolute;transform:translate(-50%,-50%);background:#fff;border:2px solid #2f72d6;padding:5px 9px;border-radius:20px;color:#163a72;font:700 13px system-ui,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 2px 7px #18314d44;max-width:185px;overflow:hidden;text-overflow:ellipsis}
-.seat-pin:hover,.seat-pin:focus{border-color:#e68b26;outline:2px solid #e7aa47}
+.traced-seat{min-width:22px;width:22px;height:22px;padding:0;line-height:18px;font-size:12px;overflow:visible}.traced-seat:not(:empty){max-width:140px}.traced-seat:hover,.traced-seat:focus{z-index:10;transform:translate(-50%,-50%) scale(1.17)}.seat-pin:hover,.seat-pin:focus{border-color:#e68b26;outline:2px solid #e7aa47}
 .overlay{position:absolute;bottom:14px;left:14px;display:flex;gap:9px;align-items:center;background:#fffdf5ee;border:1px solid #dce5ee;border-radius:9px;padding:9px 12px;font-size:12px;color:#3d5977}
 .status{font-size:12px;color:#75869d;padding:11px 16px;border-top:1px solid #e0e9f4}
 .notice{font-size:12px;color:#6b7c90;padding:14px 2px;line-height:1.7}
@@ -40,20 +40,20 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
 <button id="floor3" role="tab" data-floor="3">Floor 3</button>
 </div>
 <div class="toolbar">
-<label class="btn primary" for="image-input">Upload reference floor plan</label><input id="image-input" type="file" accept="image/png,image/jpeg,image/webp">
+<label class="btn" for="image-input">Replace with reference image</label><input id="image-input" type="file" accept="image/png,image/jpeg,image/webp">
 <button class="btn" id="add-seat" type="button">+ Add seat marker</button>
 <button class="btn" id="zoom-in" type="button" aria-label="Zoom in">＋ Zoom</button>
 <button class="btn" id="zoom-out" type="button" aria-label="Zoom out">－ Zoom</button>
 <button class="btn" id="reset-view" type="button">Fit view</button>
 <button class="btn" id="clear-layout" type="button">Clear this floor</button>
-<span class="tag" id="floor-tag">Floor 1 · 0 seats</span>
+<span class="tag" id="floor-tag">Floor 1 · 2D layout</span>
 </div>
 <div class="workspace"><div class="board" id="board" aria-label="Interactive 2D floor plan">
 <div class="stage" id="stage"><img class="plan-image" id="plan-image" alt="Selected Main Office floor-plan reference"><div id="pins"></div>
 <div class="empty" id="empty"><div class="empty-content"><div class="empty-icon">▤</div><h2 id="empty-title">Main Office · Floor 1</h2><p>Upload your floor-plan image for this floor. The reference plan appears here, and you can label seating positions on top of it. Floor 1, 2 and 3 remain independent.</p></div></div>
-</div><div class="overlay" id="hint">Drag to pan · Scroll to zoom · Add seat marker to annotate</div></div>
+</div><div class="overlay" id="hint">Click a chair to name the seat · Drag to pan · Scroll to zoom</div></div>
 <div class="status" id="status" role="status">Floor 1 selected.</div></div>
-<div class="notice">Floor-plan images and new Main Office annotations currently save <strong>in this browser only</strong>. They are not yet shared through MongoDB, so Beach Office records cannot be overwritten. The next step is to trace the supplied floor plans and create dedicated shared seating and 3D models for each floor.</div>
+<div class="notice">These 2D layouts have been traced from your three handwritten sketches. Desk positions and room boundaries are approximate because the references are freehand drawings. Click a workstation marker to assign a name. <strong>Main Office names currently save only in this browser</strong>, separately from the Beach Office MongoDB data. 3D views will be added later.</div>
 </main>
 <script>
 (()=>{
@@ -62,12 +62,93 @@ const $=id=>document.getElementById(id),board=$('board'),stage=$('stage'),image=
 const floorButtons=[1,2,3].map(n=>$('floor'+n));
 let floor=1,scale=1,offsetX=0,offsetY=0,addMode=false,start=null;
 const key=n=>'office-main-floor-v1-'+n;
-const load=n=>{try{const value=JSON.parse(localStorage.getItem(key(n))||'{}');return {image:value.image||'',seats:Array.isArray(value.seats)?value.seats:[]};}catch{return {image:'',seats:[]};}};
+const load=n=>{try{const value=JSON.parse(localStorage.getItem(key(n))||'{}');return {image:value.image||'',seats:Array.isArray(value.seats)?value.seats:[],names:value.names&&typeof value.names==='object'?value.names:{}};}catch{return {image:'',seats:[],names:{}};}};
+
+const esc=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+function tracedLayout(n){
+ const shapes=[], seats=[];
+ const text=(x,y,value,sz=16,fill='#3e5b7a',weight=700)=>shapes.push('<text x="'+x+'" y="'+y+'" font-size="'+sz+'" font-family="Arial,sans-serif" font-weight="'+weight+'" fill="'+fill+'" text-anchor="middle">'+esc(value)+'</text>');
+ const room=(x,y,w,h,name,fill='#e3ebf6')=>{shapes.push('<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="11" fill="'+fill+'" stroke="#7f9abb" stroke-width="2"/>');const lines=name.split('|');lines.forEach((line,i)=>text(x+w/2,y+h/2+6+(i-(lines.length-1)/2)*20,line,16,'#284768',750))};
+ const exit=(x,y,label)=>{shapes.push('<rect x="'+x+'" y="'+y+'" width="100" height="48" rx="8" fill="#e8f8f0" stroke="#49a17a" stroke-width="2"/>');text(x+50,y+29,label,15,'#237954',800)};
+ const desk=(id,x,y,w,h,count,vertical=false)=>{
+  const first=seats.length;
+  shapes.push('<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="9" fill="#cba174" stroke="#996e46" stroke-width="2.5"/>');
+  shapes.push('<rect x="'+(x+5)+'" y="'+(y+5)+'" width="'+(w-10)+'" height="'+(h-10)+'" rx="5" fill="none" stroke="#eac99e" stroke-width="1"/>');
+  text(x+w/2,y+h/2+5,id,16,'#493824',800);
+  for(let side=0;side<2;side++)for(let i=0;i<count;i++){
+   const px=vertical?(side===0?x-23:x+w+23):x+(i+.5)*w/count;
+   const py=vertical?y+(i+.5)*h/count:(side===0?y-22:y+h+22);
+   const seatNo=side*count+i+1;
+   const seatId=id+'-S'+seatNo;
+   shapes.push('<rect x="'+(px-10)+'" y="'+(py-10)+'" width="20" height="20" rx="6" fill="#d6e4f4" stroke="#487bb3" stroke-width="1.5"/>');
+   seats.push({id:seatId,x:px/11,y:py/7.5});
+  }
+ };
+ const feature=(x,y,w,h,label)=>{shapes.push('<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="10" fill="#f5e8d5" stroke="#b2a084" stroke-width="2"/>');text(x+w/2,y+h/2+5,label,16,'#6c5439')};
+ shapes.push('<rect width="1100" height="750" fill="#f9fbfe"/>');
+ shapes.push('<g stroke="#e9eff7" stroke-width="1">'+Array.from({length:22},(_,i)=>'<path d="M '+i*50+' 0 v 750"/>').join('')+Array.from({length:15},(_,i)=>'<path d="M 0 '+i*50+' h 1100"/>').join('')+'</g>');
+ shapes.push('<rect x="27" y="26" width="1046" height="698" rx="18" fill="none" stroke="#8da8c8" stroke-width="3"/>');
+ text(553,53,'MAIN OFFICE  —  FLOOR '+n,21,'#163d71',900);
+ if(n===1){
+  feature(475,78,250,50,'SOFA');
+  room(52,100,146,58,'Kitchen /|utility');
+  room(50,181,110,61,'Gate');
+  room(55,278,148,88,'Video|Cabin');
+  room(210,278,144,88,'Server|Room');
+  exit(933,197,'EXIT 1');exit(933,556,'EXIT 2');
+  desk('F1-T1',520,170,138,110,2,true);
+  desk('F1-T2',115,400,270,49,3);
+  desk('F1-T3',115,500,270,49,3);
+  desk('F1-T4',115,600,270,49,3);
+  desk('F1-T5',590,360,227,49,2);
+  desk('F1-T6',590,472,227,49,2);
+  desk('F1-T7',590,584,227,49,2);
+  room(50,648,195,62,'Wash Room');
+  room(258,648,370,62,'Projection Room','#e9e7f6');
+  room(642,648,250,62,'Meeting Room','#e9e7f6');
+ }else if(n===2){
+  room(45,68,175,101,'Reception /|open area');
+  feature(337,62,190,50,'Waiting Area');
+  room(58,266,155,151,'Conference|Room','#e9e7f6');
+  room(58,423,155,91,'Dining|Room','#e8f3e5');
+  room(58,520,155,114,'Visitor|Room');
+  room(55,643,220,57,'Washroom');
+  room(315,335,125,64,'Pantry');
+  room(590,82,210,114,'Office Cabin');
+  exit(938,274,'EXIT 1');exit(938,530,'EXIT 2');exit(938,654,'EXIT 3');
+  desk('F2-T1',585,250,90,140,2,true);
+  desk('F2-T2',750,240,62,338,3,true);
+  desk('F2-T3',858,240,62,338,3,true);
+  desk('F2-T4',962,376,58,205,3,true);
+  room(692,633,197,67,'Server Room');
+  shapes.push('<path d="M 285 170 V 621" stroke="#aac0d8" stroke-width="4" stroke-dasharray="9 8"/>');
+ }else{
+  room(345,77,310,84,'Meeting Room','#e9e7f6');
+  room(53,195,70,374,'Washroom');
+  exit(918,230,'EXIT 1');exit(918,500,'EXIT 2');
+  desk('F3-T1',170,265,258,45,4);
+  desk('F3-T2',170,365,258,45,4);
+  desk('F3-T3',170,465,258,45,4);
+  desk('F3-T4',170,565,258,45,4);
+  desk('F3-T5',612,237,166,54,2);
+  desk('F3-T6',612,345,166,54,2);
+  desk('F3-T7',612,453,166,54,2);
+  desk('F3-T8',612,561,166,54,2);
+  room(52,653,215,60,'Guard Room');
+  room(630,653,182,60,'HR Cabin');
+  exit(916,661,'EXIT 3');
+ }
+ shapes.push('<rect x="34" y="680" width="0" height="0" fill="none"/>');
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750" width="1100" height="750">'+shapes.join('')+'</svg>';
+ return {src:'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg),seats};
+}
+
 let data=load(1);
 function save(){try{localStorage.setItem(key(floor),JSON.stringify(data));$('status').textContent='Floor '+floor+' saved on this device.';}catch(e){$('status').textContent='Browser storage is full. Please use a smaller image.';}}
-function render(){image.src=data.image||'';image.style.display=data.image?'block':'none';empty.style.display=data.image?'none':'flex';$('empty-title').textContent='Main Office · Floor '+floor;pins.replaceChildren();
+function render(){const plan=tracedLayout(floor);image.src=data.image||plan.src;image.style.display='block';empty.style.display='none';$('empty-title').textContent='Main Office · Floor '+floor;pins.replaceChildren();
+if(!data.image)plan.seats.forEach(seat=>{const b=document.createElement('button');b.className='seat-pin traced-seat';b.textContent=data.names[seat.id]||'+';b.title=seat.id+' · Click to assign an employee';b.style.left=seat.x+'%';b.style.top=seat.y+'%';b.setAttribute('aria-label',seat.id+' employee '+(data.names[seat.id]||'unassigned'));b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',e=>{e.stopPropagation();const name=prompt('Name for '+seat.id+' (blank clears):',data.names[seat.id]||'');if(name===null)return;data.names[seat.id]=name.trim().slice(0,70);save();render()});pins.appendChild(b)});
 data.seats.forEach((seat,i)=>{const b=document.createElement('button');b.className='seat-pin';b.textContent=seat.name||('Seat '+(i+1));b.style.left=seat.x+'%';b.style.top=seat.y+'%';b.title='Click to rename · right-click to remove';b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',e=>{e.stopPropagation();const value=prompt('Name this seat (blank keeps its seat number):',seat.name||'');if(value===null)return;seat.name=value.trim().slice(0,65);save();render()});b.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();if(confirm('Remove this seat marker?')){data.seats.splice(i,1);save();render()}});pins.appendChild(b)});
-$('floor-tag').textContent='Floor '+floor+' · '+data.seats.length+' seat'+(data.seats.length===1?'':'s');
+$('floor-tag').textContent='Floor '+floor+' · '+(data.image?data.seats.length:plan.seats.length+data.seats.length)+' seats · 2D layout';
 floorButtons.forEach((b,i)=>{const on=i+1===floor;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
 document.title='Main Office — Floor '+floor+' | Office Seating Planner';
 }
@@ -80,15 +161,15 @@ $('image-input').addEventListener('change',event=>{const file=event.target.files
 const bitmap=new Image(),obj=URL.createObjectURL(file);
 bitmap.onload=()=>{const c=document.createElement('canvas');const factor=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));c.width=Math.max(1,Math.round(bitmap.width*factor));c.height=Math.max(1,Math.round(bitmap.height*factor));c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);URL.revokeObjectURL(obj);data.image=c.toDataURL('image/jpeg',.78);save();render();fit()};
 bitmap.onerror=()=>{$('status').textContent='Could not read that image.';URL.revokeObjectURL(obj)};bitmap.src=obj;event.target.value=''});
-$('add-seat').addEventListener('click',()=>{if(!data.image){$('status').textContent='Upload a floor-plan image first.';return;}addMode=!addMode;$('add-seat').classList.toggle('primary',addMode);$('hint').textContent=addMode?'Click a position on the floor plan to add a seat.':'Drag to pan · Scroll to zoom · Add seat marker to annotate'});
+$('add-seat').addEventListener('click',()=>{if(!image.src){$('status').textContent='Floor plan unavailable.';return;}addMode=!addMode;$('add-seat').classList.toggle('primary',addMode);$('hint').textContent=addMode?'Click a position on the floor plan to add a seat.':'Drag to pan · Scroll to zoom · Add seat marker to annotate'});
 board.addEventListener('pointerdown',e=>{if(e.button!==0)return;start={x:e.clientX,y:e.clientY,ox:offsetX,oy:offsetY,moved:false};board.setPointerCapture(e.pointerId)});
 board.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.hypot(dx,dy)>4)start.moved=true;if(!addMode){offsetX=start.ox+dx;offsetY=start.oy+dy;transform()}});
-board.addEventListener('pointerup',e=>{if(!start)return;const isClick=!start.moved;start=null;if(!addMode||!isClick||!data.image)return;const rect=stage.getBoundingClientRect();if(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom)return;const x=(e.clientX-rect.left)/rect.width*100,y=(e.clientY-rect.top)/rect.height*100;const name=prompt('Seat name (optional):','');if(name===null)return;data.seats.push({x,y,name:name.trim().slice(0,65)});save();render()});
+board.addEventListener('pointerup',e=>{if(!start)return;const isClick=!start.moved;start=null;if(!addMode||!isClick||!image.src)return;const rect=stage.getBoundingClientRect();if(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom)return;const x=(e.clientX-rect.left)/rect.width*100,y=(e.clientY-rect.top)/rect.height*100;const name=prompt('Seat name (optional):','');if(name===null)return;data.seats.push({x,y,name:name.trim().slice(0,65)});save();render()});
 board.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.2,Math.min(4,scale*(e.deltaY<0?1.12:.89)));transform()},{passive:false});
 $('zoom-in').onclick=()=>{scale=Math.min(4,scale*1.2);transform()};
 $('zoom-out').onclick=()=>{scale=Math.max(.2,scale/1.2);transform()};
 $('reset-view').onclick=fit;
-$('clear-layout').onclick=()=>{if(!confirm('Clear the image and annotations for Main Office Floor '+floor+' on this device?'))return;data={image:'',seats:[]};save();render()};
+$('clear-layout').onclick=()=>{if(!confirm('Clear the image and annotations for Main Office Floor '+floor+' on this device?'))return;data={image:'',seats:[],names:{}};save();render()};
 window.addEventListener('resize',fit);
 })();
 </script></body></html>

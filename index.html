@@ -40,15 +40,64 @@ footer{text-align:center;color:#8a97a8;font-size:12px;margin-top:27px}
 
 .office-global-header{position:sticky;top:0}header:not(.office-global-header){top:58px}
 .beach-search{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 17px}.beach-search label{font-weight:750;font-size:13px;color:#29466b}.beach-search input{min-width:min(380px,100%);width:min(420px,100%);background:#fff;border:1px solid #adc4df;border-radius:9px;padding:11px 14px;font-size:14px;outline:none}.beach-search input:focus{border-color:#3166d3;box-shadow:0 0 0 3px #3166d31c}.beach-search .search-results{font-size:12px;color:#526b87}.seat.seat-match{outline:3px solid #f5a623;outline-offset:4px;border-radius:8px;scroll-margin-top:155px}.table-panel.search-dimmed{opacity:.28}.seat.search-dimmed{opacity:.3}@media print{.beach-search{display:none}}
+.beach-directory{margin:0 0 22px;padding:16px;background:#fff;border:1px solid #dbe3ec;border-radius:13px}
+.beach-directory-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.beach-directory-head h2{font-size:16px;margin:0}.beach-directory-head small{color:#657891}
+.beach-directory-list{display:flex;gap:7px;flex-wrap:wrap;max-height:160px;overflow:auto}
+.beach-directory-list button{padding:7px 10px;font-size:12px;border:1px solid #bbcee8;background:#f5f9ff;border-radius:8px}
+.beach-directory-list button:hover{background:#dcecff}
+.beach-directory-hint{font-size:12px;color:#526b87;margin:9px 0}
+@media print{.beach-directory{display:none}}
+
 </style>
 </head>
 <body>
 <header class="office-global-header" aria-label="Office navigation header"><div class="office-global-inner"><div class="office-global-brand"><img class="office-brand-logo" src="/assets/aerosimple-logo.svg" alt="Aerosimple logo" width="151" height="40"><span>Office Seating Planner</span></div><nav class="office-global-tabs" aria-label="Office tabs"><a href="/layout.html" class="active" aria-current="page">Beach Office</a><a href="/main-office-floor1.html">Main Office · 1st Floor</a><a href="/main-office-floor2.html">Main Office · 2nd Floor</a><a href="/main-office-floor3.html">Main Office · 3rd Floor</a></nav></div></header>
 <header><div class="header-inner"><div><h1>Beach Office · Seating Planner</h1><div class="sub">Click any seat label to add or edit a name. Changes are shared across devices and saved to MongoDB.</div></div><div class="actions"><button id="download">Export names (CSV)</button><button id="reset">Reset seating</button><button class="primary" id="print">Print / Save PDF</button></div></div></header>
-<main><div class="app-nav"><a class="active" href="/">Seating Editor</a><a href="/layout.html">Open Beach Office 2D / 3D / Walk View</a></div><div class="beach-search"><label for="beach-person-search">Find an employee or seat</label><input type="search" id="beach-person-search" placeholder="Search name, table, or seat number…" aria-label="Search Beach Office seats and employees" autocomplete="off"><button type="button" id="beach-search-clear">Clear</button><span id="beach-search-status" class="search-results" role="status"></span></div><div class="info"><span><i class="dot"></i>Named seat</span><span><i class="dot empty"></i>Available seat</span><span><strong>Tables 1–3:</strong> 3 seats per side</span><span><strong>Tables 4–5:</strong> 6 seats per side</span><span id="counter"></span><span id="sync-status" role="status" aria-live="polite">Connecting…</span></div><div id="floor" class="floor"></div><footer>Live shared seating • All 5 tables • 42 seats total</footer></main>
+<main><div class="app-nav"><a class="active" href="/">Seating Editor</a><a href="/layout.html">Open Beach Office 2D / 3D / Walk View</a></div><div class="beach-search"><label for="beach-person-search">Find an employee or seat</label><input type="search" id="beach-person-search" placeholder="Search name, table, or seat number…" aria-label="Search Beach Office seats and employees" autocomplete="off"><button type="button" id="beach-search-clear">Clear</button><span id="beach-search-status" class="search-results" role="status"></span></div><section class="beach-directory" aria-label="Static employee list"><div class="beach-directory-head"><h2>Employee list</h2><small id="beach-directory-count">Loading saved list…</small></div><div id="beach-directory-list" class="beach-directory-list"></div><p class="beach-directory-hint">Click a name to locate their seat. To assign someone, click a seat name field, choose an employee below, then press Assign.</p><select id="beach-assignment-name" aria-label="Employee to assign" style="padding:8px;border:1px solid #adc4df;border-radius:8px;max-width:100%"><option value="">Choose an employee…</option></select> <button type="button" id="beach-assignment-save">Assign to selected seat</button> <span id="beach-assignment-status" role="status" style="font-size:12px;color:#38516f"></span></section><div class="info"><span><i class="dot"></i>Named seat</span><span><i class="dot empty"></i>Available seat</span><span><strong>Tables 1–3:</strong> 3 seats per side</span><span><strong>Tables 4–5:</strong> 6 seats per side</span><span id="counter"></span><span id="sync-status" role="status" aria-live="polite">Connecting…</span></div><div id="floor" class="floor"></div><footer>Live shared seating • All 5 tables • 42 seats total</footer></main>
 <script>
 (()=>{
  const API='/api/seats';
+ let savedEmployees=[],selectedBeachSeat=null;
+ const selectEmployee=document.getElementById('beach-assignment-name');
+ const selectedStatus=document.getElementById('beach-assignment-status');
+ function renderDirectory(){
+   const list=document.getElementById('beach-directory-list');list.replaceChildren();
+   const q=document.getElementById('beach-person-search').value.trim().toLowerCase();
+   const matches=savedEmployees.filter(e=>!q||e.name.toLowerCase().includes(q));
+   document.getElementById('beach-directory-count').textContent=savedEmployees.length+' saved employee names · Beach Office starter list';
+   for(const employee of matches){
+     const b=document.createElement('button');b.type='button';b.textContent=employee.name;
+     b.onclick=()=>{document.getElementById('beach-person-search').value=employee.name;searchBeach.scroll=true;searchBeach();selectEmployee.value=employee.name;};
+     list.append(b);
+   }
+   if(!matches.length){const p=document.createElement('span');p.textContent='No matching saved names';list.append(p);}
+ }
+ async function initDirectory(){
+   try{
+     const response=await fetch('/data/employees.json',{cache:'force-cache'});
+     if(!response.ok)throw Error('File unavailable');
+     const snapshot=await response.json();
+     if(!Array.isArray(snapshot.employees))throw Error('Invalid list');
+     savedEmployees=snapshot.employees;
+     for(const e of savedEmployees){const option=document.createElement('option');option.value=e.name;option.textContent=e.name;selectEmployee.append(option);}
+     renderDirectory();
+   }catch(error){document.getElementById('beach-directory-count').textContent='Unable to load saved employee JSON';}
+ }
+ document.getElementById('beach-assignment-save').onclick=()=>{
+   const name=selectEmployee.value;
+   if(!selectedBeachSeat){selectedStatus.textContent='First click the name field of a seat to select it.';return;}
+   if(!name){selectedStatus.textContent='Choose an employee first.';return;}
+   const current=(names[selectedBeachSeat]||'').trim();
+   if(current&&current!==name&&!confirm('Replace '+current+' with '+name+'?'))return;
+   const origin=Object.keys(names).find(key=>key!==selectedBeachSeat&&(names[key]||'').trim().toLowerCase()===name.toLowerCase());
+   if(origin&&!confirm(name+' is already assigned to another seat. Move here?'))return;
+   if(origin){names[origin]='';const prev=document.querySelector('.name-input[data-key="'+origin+'"]');if(prev)prev.value='';saveSoon(origin);}
+   names[selectedBeachSeat]=name;
+   const input=document.querySelector('.name-input[data-key="'+selectedBeachSeat+'"]');if(input)input.value=name;
+   saveSoon(selectedBeachSeat);update();selectedStatus.textContent=name+' assigned · saving to MongoDB';
+ };
+
  const searchBox=document.getElementById('beach-person-search');
  const searchStatus=document.getElementById('beach-search-status');
  function searchBeach(){
@@ -66,6 +115,7 @@ footer{text-align:center;color:#8a97a8;font-size:12px;margin-top:27px}
     panel.classList.toggle('search-dimmed',!!q&&!panel.querySelector('.seat-match'));
   }
   searchStatus.textContent=q ? hits+' matching seats' : 'Search all 42 Beach Office seats';
+  if(savedEmployees.length)renderDirectory();
   if(first&&searchBeach.scroll){first.scrollIntoView({block:'center',behavior:'smooth'});searchBeach.scroll=false;}
  }
  searchBox.addEventListener('input',()=>{searchBeach.scroll=true;searchBeach();});
@@ -83,12 +133,12 @@ footer{text-align:center;color:#8a97a8;font-size:12px;margin-top:27px}
  let names={...defaults};
  const floor=document.getElementById('floor');
  function update(){const inputs=[...document.querySelectorAll('.name-input')];let count=0;for(const el of inputs){const occupied=!!el.value.trim();el.parentElement.classList.toggle('occupied',occupied);el.parentElement.querySelector('.avatar').textContent=occupied?'●':'+';if(occupied)count++}document.getElementById('counter').textContent=`${count} of ${inputs.length} seats named`; if(document.getElementById('beach-person-search').value) searchBeach()}
- function seat(table,side,index){const key=`${table}-${side}-${index}`;const div=document.createElement('div');div.className='seat '+side;const chair=document.createElement('div');chair.className='chair';const avatar=document.createElement('div');avatar.className='avatar';chair.append(avatar);const input=document.createElement('input');input.className='name-input';input.dataset.key=key;input.type='text';input.value=names[key]||'';input.placeholder='Empty';input.setAttribute('aria-label',`Table ${table}, ${side} side, seat ${index+1}, name`);input.maxLength=70;input.addEventListener('input',()=>{names[key]=input.value;update();saveSoon(key)});div.append(chair,input);return div}
+ function seat(table,side,index){const key=`${table}-${side}-${index}`;const div=document.createElement('div');div.className='seat '+side;const chair=document.createElement('div');chair.className='chair';const avatar=document.createElement('div');avatar.className='avatar';chair.append(avatar);const input=document.createElement('input');input.className='name-input';input.dataset.key=key;input.type='text';input.value=names[key]||'';input.placeholder='Empty';input.setAttribute('aria-label',`Table ${table}, ${side} side, seat ${index+1}, name`);input.maxLength=70;input.addEventListener('focus',()=>{selectedBeachSeat=key;selectedStatus.textContent='Selected: Table '+table+', '+side+' seat '+(index+1);});input.addEventListener('input',()=>{names[key]=input.value;update();saveSoon(key)});div.append(chair,input);return div}
  function draw(){floor.textContent='';specs.forEach((count,i)=>{const n=i+1;const panel=document.createElement('section');panel.className='table-panel'+(count===6?' large':'');const head=document.createElement('div');head.className='panel-head';const title=document.createElement('h2');title.textContent=`Table ${n}`;const capacity=document.createElement('span');capacity.className='capacity';capacity.textContent=`${count*2} seats · ${count} each side`;head.append(title,capacity);const layout=document.createElement('div');layout.className='table-layout';for(const side of ['top','bottom']){if(side==='bottom'){const desk=document.createElement('div');desk.className='desk';const label=document.createElement('span');label.className='desk-label';label.textContent=`Table ${n}`;desk.append(label);layout.append(desk)}const seats=document.createElement('div');seats.className='seats';seats.style.setProperty('--seat-count',count);for(let j=0;j<count;j++)seats.append(seat(n,side,j));layout.append(seats)}panel.append(head,layout);floor.append(panel)});update()}
  document.getElementById('reset').addEventListener('click',()=>{if(confirm('Reset all shared names to the original seating plan for everyone?')){names={...defaults};draw();for(let i=0;i<specs.length;i++)for(const side of ['top','bottom'])for(let j=0;j<specs[i];j++)saveSoon(`${i+1}-${side}-${j}`)}});
  document.getElementById('print').addEventListener('click',()=>window.print());
  document.getElementById('download').addEventListener('click',()=>{const rows=[['Table','Side','Position (left to right)','Name']];specs.forEach((count,i)=>{for(const side of ['top','bottom'])for(let j=0;j<count;j++)rows.push([i+1,side,j+1,names[`${i+1}-${side}-${j}`]||''])});const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='office_seating_names.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
- draw();load();setInterval(load,5000);window.addEventListener('focus',load);
+ draw();load();initDirectory();setInterval(load,5000);window.addEventListener('focus',load);
 })();
 </script>
 </body>

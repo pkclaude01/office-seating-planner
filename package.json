@@ -6,7 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "check": "node --check api/seats.js && node scripts/check-layout.js"
+    "check": "node --check api/seats.js && node --check api/employees.js && node --check lib/employees.cjs && node --check main-office/assignments.mjs && node --check main-office/directory.mjs && node scripts/check-layout.js && node --test scripts/assignments.test.mjs"
   },
   "dependencies": {
     "mongodb": "^6.20.0"

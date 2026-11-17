@@ -15,9 +15,21 @@ The seating editor is available at [the site homepage](https://office-seating-pl
 
 Static seating editor and live Three.js office floor plan using Vercel serverless API and MongoDB Atlas.
 
+## Employee directory & Main Office seat assignment
+
+**New on Main Office Floors 1–3:** search active employees by name, employee code or ID; select a seat and open **ASSIGN / MOVE**; assign, move, swap, replace or clear an employee. Each floor saves assignments **in that browser only**, preserving legacy name-only assignments. These are **not yet shared through MongoDB**; Beach Office's MongoDB assignments are unaffected.
+
+**Production setup (Vercel → Settings → Environment Variables → Production):**
+- `PEOPLESIMPLE_TOKEN` — server-side PeopleSimple API bearer token; **never put this token in frontend code, GitHub, or chat**.
+- `EMPLOYEE_DIRECTORY_ACCESS_KEY` — a separate long random access code for staff using the directory; **do not reuse the PeopleSimple token**.
+
+Both variables are required. The `/api/employees` endpoint checks the access code before contacting PeopleSimple and returns only active employee names/IDs/codes. Authorized users click **ACCESS EMPLOYEE LIST** and enter the separate access code, which is held in their browser session. Without these variables, the employee list shows a configuration error rather than exposing data. Employee IDs in seating assignments remain local to the browser.
+
+To validate the source: `npm run check`.
+
 ## Functionality
 
-- **Main Office** has independent Three.js models for Floors 1–3, traced from the supplied sketches: 34, 26 and 48 workstation seats respectively. Top, orbit and walk views support seat naming, search and PNG export. Names are stored locally in each browser. Existing local image/annotation data is retained in storage but is not displayed in the 3D views.
+- **Main Office** has independent Three.js models for Floors 1–3, traced from the supplied sketches: 34, 26 and 48 workstation seats respectively. Top, orbit and walk views support seat naming, search and PNG export. Employee assignments are stored locally in each browser. Existing local image/annotation data is retained in storage but is not displayed in the 3D views.
 - Existing Beach Office seating data, geometry and MongoDB API remain untouched.
 - `index.html` — editable seats with automatic PATCH saving and live GET refresh.
 - `layout.html` — immersive office model supplied by the project owner, with **Top View**, **3D View**, **Walk**, seat selection, and **Edit Name** action.

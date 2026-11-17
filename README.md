@@ -14,7 +14,7 @@ Static seating editor and live Three.js office floor plan using Vercel serverles
 
 ## Functionality
 
-- **Main Office** has independent Floor 1, Floor 2 and Floor 3 2D reference boards; image uploads and seat annotations are stored locally in each browser until dedicated backend persistence is configured.
+- **Main Office** has independent Three.js models for Floors 1–3, traced from the supplied sketches: 34, 26 and 48 workstation seats respectively. Top, orbit and walk views support seat naming, search and PNG export. Names are stored locally in each browser. Existing local image/annotation data is retained in storage but is not displayed in the 3D views.
 - Existing Beach Office seating data, geometry and MongoDB API remain untouched.
 - `index.html` — editable seats with automatic PATCH saving and live GET refresh.
 - `layout.html` — immersive office model supplied by the project owner, with **Top View**, **3D View**, **Walk**, seat selection, and **Edit Name** action.

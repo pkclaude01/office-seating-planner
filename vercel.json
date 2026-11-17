@@ -4,6 +4,9 @@
   "functions": {
     "api/seats.js": {
       "maxDuration": 15
+    },
+    "api/employees.js": {
+      "maxDuration": 15
     }
   }
 }

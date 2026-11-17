@@ -1,0 +1,11 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const api=fs.readFileSync('api/employees.js','utf8');
+const dl=fs.readFileSync('scripts/fetch-employees-once.cjs','utf8');
+assert.ok(api.includes('EMPLOYEE_DIRECTORY_JSON'));
+assert.ok(api.includes('readStaticDirectory'));
+assert.ok(!api.includes('api.peoplesimple.in'),'Runtime must not call PeopleSimple');
+assert.ok(dl.includes('api.peoplesimple.in'),'Only one-time import contacts PeopleSimple');
+assert.ok(fs.readFileSync('.gitignore','utf8').includes('.private/'));
+console.log('Static directory safeguards passed');

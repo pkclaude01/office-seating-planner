@@ -2,6 +2,7 @@
 
 ## Live website
 
+- **Main Office · Floor 1 (Top/3D/Walk):** https://office-seating-planner-pkclaude-3994.vercel.app/main-office-floor1.html
 - **Beach Office — Seating Editor:** https://office-seating-planner-pkclaude-3994.vercel.app/
 - **Beach Office — 2D / 3D / Walk:** https://office-seating-planner-pkclaude-3994.vercel.app/layout.html
 - **Main Office — Floors 1, 2, 3:** https://office-seating-planner-pkclaude-3994.vercel.app/main-office.html

@@ -15,6 +15,10 @@ The seating editor is available at [the site homepage](https://office-seating-pl
 
 Static seating editor and live Three.js office floor plan using Vercel serverless API and MongoDB Atlas.
 
+## Static employee roster (no login)
+
+The frontend loads `/data/employees.json`, which contains 29 names already assigned in the Beach Office seating database on November 17, 2026. This is a **partial list of currently named seats**, not a complete company roster. IDs are local placeholders, not verified PeopleSimple IDs. Both Beach Office and Main Office floors 1–3 use this JSON. The employee-list and seat-assignment UIs need no API key or access-code prompt. To add all employees, replace the JSON with an authorized full roster. The repository and JSON are **public**; do not put sensitive data or private identifiers in this file.
+
 ## One-time employee list (private static JSON)
 
 Employee search now reads a **fixed JSON snapshot** instead of contacting PeopleSimple on each visit. The site's `/api/employees` endpoint only reads `EMPLOYEE_DIRECTORY_JSON` or a private local file and requires `EMPLOYEE_DIRECTORY_ACCESS_KEY`. No live PeopleSimple calls are made by the deployed site.

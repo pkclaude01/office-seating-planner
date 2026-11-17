@@ -39,15 +39,38 @@ footer{text-align:center;color:#8a97a8;font-size:12px;margin-top:27px}
 @media(max-width:640px){.office-global-inner{gap:7px;min-height:54px;padding:7px 10px}.office-global-brand{font-size:12px;gap:7px}.office-brand-logo{width:103px;height:28px}.office-global-tabs a{font-size:11px;padding:9px 10px}}
 
 .office-global-header{position:sticky;top:0}header:not(.office-global-header){top:58px}
+.beach-search{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 17px}.beach-search label{font-weight:750;font-size:13px;color:#29466b}.beach-search input{min-width:min(380px,100%);width:min(420px,100%);background:#fff;border:1px solid #adc4df;border-radius:9px;padding:11px 14px;font-size:14px;outline:none}.beach-search input:focus{border-color:#3166d3;box-shadow:0 0 0 3px #3166d31c}.beach-search .search-results{font-size:12px;color:#526b87}.seat.seat-match{outline:3px solid #f5a623;outline-offset:4px;border-radius:8px;scroll-margin-top:155px}.table-panel.search-dimmed{opacity:.28}.seat.search-dimmed{opacity:.3}@media print{.beach-search{display:none}}
 </style>
 </head>
 <body>
 <header class="office-global-header" aria-label="Office navigation header"><div class="office-global-inner"><div class="office-global-brand"><img class="office-brand-logo" src="/assets/aerosimple-logo.svg" alt="Aerosimple logo" width="151" height="40"><span>Office Seating Planner</span></div><nav class="office-global-tabs" aria-label="Office tabs"><a href="/layout.html" class="active" aria-current="page">Beach Office</a><a href="/main-office-floor1.html">Main Office · 1st Floor</a><a href="/main-office-floor2.html">Main Office · 2nd Floor</a><a href="/main-office-floor3.html">Main Office · 3rd Floor</a></nav></div></header>
 <header><div class="header-inner"><div><h1>Beach Office · Seating Planner</h1><div class="sub">Click any seat label to add or edit a name. Changes are shared across devices and saved to MongoDB.</div></div><div class="actions"><button id="download">Export names (CSV)</button><button id="reset">Reset seating</button><button class="primary" id="print">Print / Save PDF</button></div></div></header>
-<main><div class="app-nav"><a class="active" href="/">Seating Editor</a><a href="/layout.html">Open Beach Office 2D / 3D / Walk View</a></div><div class="info"><span><i class="dot"></i>Named seat</span><span><i class="dot empty"></i>Available seat</span><span><strong>Tables 1–3:</strong> 3 seats per side</span><span><strong>Tables 4–5:</strong> 6 seats per side</span><span id="counter"></span><span id="sync-status" role="status" aria-live="polite">Connecting…</span></div><div id="floor" class="floor"></div><footer>Live shared seating • All 5 tables • 42 seats total</footer></main>
+<main><div class="app-nav"><a class="active" href="/">Seating Editor</a><a href="/layout.html">Open Beach Office 2D / 3D / Walk View</a></div><div class="beach-search"><label for="beach-person-search">Find an employee or seat</label><input type="search" id="beach-person-search" placeholder="Search name, table, or seat number…" aria-label="Search Beach Office seats and employees" autocomplete="off"><button type="button" id="beach-search-clear">Clear</button><span id="beach-search-status" class="search-results" role="status"></span></div><div class="info"><span><i class="dot"></i>Named seat</span><span><i class="dot empty"></i>Available seat</span><span><strong>Tables 1–3:</strong> 3 seats per side</span><span><strong>Tables 4–5:</strong> 6 seats per side</span><span id="counter"></span><span id="sync-status" role="status" aria-live="polite">Connecting…</span></div><div id="floor" class="floor"></div><footer>Live shared seating • All 5 tables • 42 seats total</footer></main>
 <script>
 (()=>{
  const API='/api/seats';
+ const searchBox=document.getElementById('beach-person-search');
+ const searchStatus=document.getElementById('beach-search-status');
+ function searchBeach(){
+  const q=searchBox.value.trim().toLowerCase();
+  let hits=0,first=null;
+  for(const input of document.querySelectorAll('.name-input')){
+    const label=input.getAttribute('aria-label')||'';
+    const match=q && ((input.value||'').toLowerCase().includes(q)||label.toLowerCase().includes(q)||input.dataset.key.toLowerCase().includes(q));
+    const seat=input.closest('.seat');
+    seat.classList.toggle('seat-match',!!match);
+    seat.classList.toggle('search-dimmed',!!q&&!match);
+    if(match){hits++;first=first||seat;}
+  }
+  for(const panel of document.querySelectorAll('.table-panel')){
+    panel.classList.toggle('search-dimmed',!!q&&!panel.querySelector('.seat-match'));
+  }
+  searchStatus.textContent=q ? hits+' matching seats' : 'Search all 42 Beach Office seats';
+  if(first&&searchBeach.scroll){first.scrollIntoView({block:'center',behavior:'smooth'});searchBeach.scroll=false;}
+ }
+ searchBox.addEventListener('input',()=>{searchBeach.scroll=true;searchBeach();});
+ document.getElementById('beach-search-clear').addEventListener('click',()=>{searchBox.value='';searchBeach.scroll=false;searchBeach();searchBox.focus();});
+ 
  const syncEl=document.getElementById('sync-status');
  const pending=new Set();const timers=new Map();
  let online=false; let fetching=false;
@@ -59,7 +82,7 @@ footer{text-align:center;color:#8a97a8;font-size:12px;margin-top:27px}
  const defaults={ '1-top-0':'','1-top-1':'','1-top-2':'','1-bottom-0':'Josh','1-bottom-1':'PK','1-bottom-2':'Karthik','2-top-0':'Uday','2-top-1':'Kishore','2-top-2':'Murali' };
  let names={...defaults};
  const floor=document.getElementById('floor');
- function update(){const inputs=[...document.querySelectorAll('.name-input')];let count=0;for(const el of inputs){const occupied=!!el.value.trim();el.parentElement.classList.toggle('occupied',occupied);el.parentElement.querySelector('.avatar').textContent=occupied?'●':'+';if(occupied)count++}document.getElementById('counter').textContent=`${count} of ${inputs.length} seats named`}
+ function update(){const inputs=[...document.querySelectorAll('.name-input')];let count=0;for(const el of inputs){const occupied=!!el.value.trim();el.parentElement.classList.toggle('occupied',occupied);el.parentElement.querySelector('.avatar').textContent=occupied?'●':'+';if(occupied)count++}document.getElementById('counter').textContent=`${count} of ${inputs.length} seats named`; if(document.getElementById('beach-person-search').value) searchBeach()}
  function seat(table,side,index){const key=`${table}-${side}-${index}`;const div=document.createElement('div');div.className='seat '+side;const chair=document.createElement('div');chair.className='chair';const avatar=document.createElement('div');avatar.className='avatar';chair.append(avatar);const input=document.createElement('input');input.className='name-input';input.dataset.key=key;input.type='text';input.value=names[key]||'';input.placeholder='Empty';input.setAttribute('aria-label',`Table ${table}, ${side} side, seat ${index+1}, name`);input.maxLength=70;input.addEventListener('input',()=>{names[key]=input.value;update();saveSoon(key)});div.append(chair,input);return div}
  function draw(){floor.textContent='';specs.forEach((count,i)=>{const n=i+1;const panel=document.createElement('section');panel.className='table-panel'+(count===6?' large':'');const head=document.createElement('div');head.className='panel-head';const title=document.createElement('h2');title.textContent=`Table ${n}`;const capacity=document.createElement('span');capacity.className='capacity';capacity.textContent=`${count*2} seats · ${count} each side`;head.append(title,capacity);const layout=document.createElement('div');layout.className='table-layout';for(const side of ['top','bottom']){if(side==='bottom'){const desk=document.createElement('div');desk.className='desk';const label=document.createElement('span');label.className='desk-label';label.textContent=`Table ${n}`;desk.append(label);layout.append(desk)}const seats=document.createElement('div');seats.className='seats';seats.style.setProperty('--seat-count',count);for(let j=0;j<count;j++)seats.append(seat(n,side,j));layout.append(seats)}panel.append(head,layout);floor.append(panel)});update()}
  document.getElementById('reset').addEventListener('click',()=>{if(confirm('Reset all shared names to the original seating plan for everyone?')){names={...defaults};draw();for(let i=0;i<specs.length;i++)for(const side of ['top','bottom'])for(let j=0;j<specs[i];j++)saveSoon(`${i+1}-${side}-${j}`)}});

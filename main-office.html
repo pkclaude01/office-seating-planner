@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Main Office — Floor Plans | Office Seating Planner</title>
+<style>
+:root{font:15px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#1b2d47;background:#f5f7fb}
+*{box-sizing:border-box}body{margin:0}a{color:inherit;text-decoration:none}button,input{font:inherit}
+header{background:#fff;border-bottom:1px solid #e1e7f0;box-shadow:0 3px 15px #2341  }
+.wrap{max-width:1420px;margin:auto;padding:20px 24px}.brand{font-size:23px;font-weight:800;letter-spacing:-.6px}.sub{color:#677a93;font-size:13px;margin-top:5px}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:19px}
+nav a,.tabs button{padding:11px 16px;border-radius:10px;border:1px solid #dbe4f0;background:#fff;color:#365171;font-weight:750;font-size:13px;cursor:pointer}
+nav a.active,.tabs button.active{background:#235bce;color:white;border-color:#235bce}
+nav a:hover:not(.active),.tabs button:hover:not(.active){background:#edf4ff}
+h1{font-size:30px;letter-spacing:-.8px;margin:10px 0 4px}
+main{max-width:1420px;margin:auto;padding:25px 24px 50px}
+.lead{font-size:14px;color:#657890;margin:0 0 17px}.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+.toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:13px}
+.btn{border:1px solid #d5e0ee;border-radius:9px;padding:10px 13px;background:#fff;font-weight:700;color:#375576;cursor:pointer}
+.btn.primary{background:#2563d6;border-color:#2563d6;color:white}.btn:hover{filter:brightness(.96)}
+.tag{font-size:12px;color:#6a7b90;margin-left:auto}
+.workspace{background:#fff;border:1px solid #dbe5f1;border-radius:16px;box-shadow:0 10px 35px #122f4910;overflow:hidden}
+.board{height:min(71vh,780px);min-height:470px;position:relative;overflow:hidden;background-color:#eef3fa;background-image:linear-gradient(#dce7f377 1px,transparent 1px),linear-gradient(90deg,#dce7f377 1px,transparent 1px);background-size:26px 26px;touch-action:none}
+.stage{position:absolute;left:50%;top:50%;width:1100px;height:750px;transform-origin:50% 50%;background:#fff;box-shadow:0 3px 28px #1f40552b;border:1px solid #c8d7e9}
+.plan-image{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px}
+.empty-content{max-width:470px}.empty-icon{font-size:57px;color:#4676c0}.empty h2{font-size:23px;margin:8px 0}.empty p{font-size:14px;color:#6b8199;line-height:1.7}
+.seat-pin{position:absolute;transform:translate(-50%,-50%);background:#fff;border:2px solid #2f72d6;padding:5px 9px;border-radius:20px;color:#163a72;font:700 13px system-ui,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 2px 7px #18314d44;max-width:185px;overflow:hidden;text-overflow:ellipsis}
+.seat-pin:hover,.seat-pin:focus{border-color:#e68b26;outline:2px solid #e7aa47}
+.overlay{position:absolute;bottom:14px;left:14px;display:flex;gap:9px;align-items:center;background:#fffdf5ee;border:1px solid #dce5ee;border-radius:9px;padding:9px 12px;font-size:12px;color:#3d5977}
+.status{font-size:12px;color:#75869d;padding:11px 16px;border-top:1px solid #e0e9f4}
+.notice{font-size:12px;color:#6b7c90;padding:14px 2px;line-height:1.7}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+@media(max-width:700px){.wrap,main{padding:17px 12px}h1{font-size:25px}.board{height:62vh;min-height:390px}.tag{margin-left:0;width:100%}}
+</style></head><body>
+<header><div class="wrap"><div class="brand">Office Seating Planner</div><div class="sub">Beach Office and Main Office floor plans</div>
+<nav aria-label="Office navigation"><a href="/">Beach Office · Seating Editor</a><a href="/layout.html">Beach Office · 2D &amp; 3D</a><a class="active" aria-current="page" href="/main-office.html">Main Office · Floors 1–3</a></nav></div></header>
+<main><h1>Main Office</h1><p class="lead">Floor-specific 2D plans. The existing Beach Office 2D/3D office and employee names are preserved.</p>
+<div class="tabs" role="tablist" aria-label="Main Office floor selector">
+<button id="floor1" role="tab" data-floor="1">Floor 1</button>
+<button id="floor2" role="tab" data-floor="2">Floor 2</button>
+<button id="floor3" role="tab" data-floor="3">Floor 3</button>
+</div>
+<div class="toolbar">
+<label class="btn primary" for="image-input">Upload reference floor plan</label><input id="image-input" type="file" accept="image/png,image/jpeg,image/webp">
+<button class="btn" id="add-seat" type="button">+ Add seat marker</button>
+<button class="btn" id="zoom-in" type="button" aria-label="Zoom in">＋ Zoom</button>
+<button class="btn" id="zoom-out" type="button" aria-label="Zoom out">－ Zoom</button>
+<button class="btn" id="reset-view" type="button">Fit view</button>
+<button class="btn" id="clear-layout" type="button">Clear this floor</button>
+<span class="tag" id="floor-tag">Floor 1 · 0 seats</span>
+</div>
+<div class="workspace"><div class="board" id="board" aria-label="Interactive 2D floor plan">
+<div class="stage" id="stage"><img class="plan-image" id="plan-image" alt="Selected Main Office floor-plan reference"><div id="pins"></div>
+<div class="empty" id="empty"><div class="empty-content"><div class="empty-icon">▤</div><h2 id="empty-title">Main Office · Floor 1</h2><p>Upload your floor-plan image for this floor. The reference plan appears here, and you can label seating positions on top of it. Floor 1, 2 and 3 remain independent.</p></div></div>
+</div><div class="overlay" id="hint">Drag to pan · Scroll to zoom · Add seat marker to annotate</div></div>
+<div class="status" id="status" role="status">Floor 1 selected.</div></div>
+<div class="notice">Floor-plan images and new Main Office annotations currently save <strong>in this browser only</strong>. They are not yet shared through MongoDB, so Beach Office records cannot be overwritten. The next step is to trace the supplied floor plans and create dedicated shared seating and 3D models for each floor.</div>
+</main>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id),board=$('board'),stage=$('stage'),image=$('plan-image'),empty=$('empty'),pins=$('pins');
+const floorButtons=[1,2,3].map(n=>$('floor'+n));
+let floor=1,scale=1,offsetX=0,offsetY=0,addMode=false,start=null;
+const key=n=>'office-main-floor-v1-'+n;
+const load=n=>{try{const value=JSON.parse(localStorage.getItem(key(n))||'{}');return {image:value.image||'',seats:Array.isArray(value.seats)?value.seats:[]};}catch{return {image:'',seats:[]};}};
+let data=load(1);
+function save(){try{localStorage.setItem(key(floor),JSON.stringify(data));$('status').textContent='Floor '+floor+' saved on this device.';}catch(e){$('status').textContent='Browser storage is full. Please use a smaller image.';}}
+function render(){image.src=data.image||'';image.style.display=data.image?'block':'none';empty.style.display=data.image?'none':'flex';$('empty-title').textContent='Main Office · Floor '+floor;pins.replaceChildren();
+data.seats.forEach((seat,i)=>{const b=document.createElement('button');b.className='seat-pin';b.textContent=seat.name||('Seat '+(i+1));b.style.left=seat.x+'%';b.style.top=seat.y+'%';b.title='Click to rename · right-click to remove';b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',e=>{e.stopPropagation();const value=prompt('Name this seat (blank keeps its seat number):',seat.name||'');if(value===null)return;seat.name=value.trim().slice(0,65);save();render()});b.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();if(confirm('Remove this seat marker?')){data.seats.splice(i,1);save();render()}});pins.appendChild(b)});
+$('floor-tag').textContent='Floor '+floor+' · '+data.seats.length+' seat'+(data.seats.length===1?'':'s');
+floorButtons.forEach((b,i)=>{const on=i+1===floor;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+document.title='Main Office — Floor '+floor+' | Office Seating Planner';
+}
+function transform(){stage.style.transform='translate(calc(-50% + '+offsetX+'px),calc(-50% + '+offsetY+'px)) scale('+scale+')'}
+function fit(){const w=board.clientWidth,h=board.clientHeight;scale=Math.min((w-40)/1100,(h-40)/750,1);offsetX=offsetY=0;transform()}
+function choose(n){floor=n;const url=new URL(location.href);url.searchParams.set('floor',String(n));history.replaceState({},'',url);data=load(floor);addMode=false;$('add-seat').classList.remove('primary');render();fit();$('status').textContent='Floor '+floor+' selected.'}
+floorButtons.forEach(b=>b.addEventListener('click',()=>choose(Number(b.dataset.floor))));
+const url=new URL(location.href),chosen=Number(url.searchParams.get('floor'));choose([1,2,3].includes(chosen)?chosen:1);
+$('image-input').addEventListener('change',event=>{const file=event.target.files?.[0];if(!file)return;if(!/^image\/(png|jpeg|webp)$/.test(file.type)){$('status').textContent='Please select PNG, JPG, or WebP.';return;}
+const bitmap=new Image(),obj=URL.createObjectURL(file);
+bitmap.onload=()=>{const c=document.createElement('canvas');const factor=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));c.width=Math.max(1,Math.round(bitmap.width*factor));c.height=Math.max(1,Math.round(bitmap.height*factor));c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);URL.revokeObjectURL(obj);data.image=c.toDataURL('image/jpeg',.78);save();render();fit()};
+bitmap.onerror=()=>{$('status').textContent='Could not read that image.';URL.revokeObjectURL(obj)};bitmap.src=obj;event.target.value=''});
+$('add-seat').addEventListener('click',()=>{if(!data.image){$('status').textContent='Upload a floor-plan image first.';return;}addMode=!addMode;$('add-seat').classList.toggle('primary',addMode);$('hint').textContent=addMode?'Click a position on the floor plan to add a seat.':'Drag to pan · Scroll to zoom · Add seat marker to annotate'});
+board.addEventListener('pointerdown',e=>{if(e.button!==0)return;start={x:e.clientX,y:e.clientY,ox:offsetX,oy:offsetY,moved:false};board.setPointerCapture(e.pointerId)});
+board.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.hypot(dx,dy)>4)start.moved=true;if(!addMode){offsetX=start.ox+dx;offsetY=start.oy+dy;transform()}});
+board.addEventListener('pointerup',e=>{if(!start)return;const isClick=!start.moved;start=null;if(!addMode||!isClick||!data.image)return;const rect=stage.getBoundingClientRect();if(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom)return;const x=(e.clientX-rect.left)/rect.width*100,y=(e.clientY-rect.top)/rect.height*100;const name=prompt('Seat name (optional):','');if(name===null)return;data.seats.push({x,y,name:name.trim().slice(0,65)});save();render()});
+board.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.2,Math.min(4,scale*(e.deltaY<0?1.12:.89)));transform()},{passive:false});
+$('zoom-in').onclick=()=>{scale=Math.min(4,scale*1.2);transform()};
+$('zoom-out').onclick=()=>{scale=Math.max(.2,scale/1.2);transform()};
+$('reset-view').onclick=fit;
+$('clear-layout').onclick=()=>{if(!confirm('Clear the image and annotations for Main Office Floor '+floor+' on this device?'))return;data={image:'',seats:[]};save();render()};
+window.addEventListener('resize',fit);
+})();
+</script></body></html>

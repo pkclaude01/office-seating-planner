@@ -77,7 +77,7 @@ export function createDirectory({ seats, seatName, selectedSeat, read, save, foc
   async function load() {
     loading = true; failure = ''; render();
     try {
-      const response = await fetch('/data/employees.json', {cache:'force-cache'});
+      const response = await fetch('/api/employees', {cache:'no-store'});
       const data = await response.json();
       if (!response.ok || !Array.isArray(data.employees)) throw Error(data.error || 'Employee directory unavailable.');
       employees = data.employees;
